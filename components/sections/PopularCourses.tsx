@@ -2,11 +2,12 @@
 
 import { CourseCard } from "@/components/ui/CourseCard";
 import { Button } from "@/components/ui/button";
-import { Badge } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 const MOCK_COURSES = [
   {
+    id: "1",
     title: "Marketing Digital : Devenez un Expert en 2026",
     category: "Marketing",
     price: "15 000 FCFA",
@@ -19,6 +20,7 @@ const MOCK_COURSES = [
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop"
   },
   {
+    id: "2",
     title: "Importation Chine : Le Guide Ultime de l'Acheteur",
     category: "Business",
     price: "20 000 FCFA",
@@ -29,6 +31,7 @@ const MOCK_COURSES = [
     image: "https://images.unsplash.com/photo-1553413077-190dd305871c?q=80&w=800&auto=format&fit=crop"
   },
   {
+    id: "3",
     title: "UI/UX Design : Créez des Interfaces Modernes",
     category: "Design",
     price: "25 000 FCFA",
@@ -55,7 +58,7 @@ export function PopularCourses() {
             Nos Formations <span className="text-blue-600">Populaires</span>
           </h2>
           <p className="text-slate-500 max-w-2xl mx-auto font-medium">
-            Découvrez les cours qui transforment la vie de milliers d'étudiants à travers le continent.
+            Découvrez les cours qui transforment la vie de milliers d&apos;étudiants à travers le continent.
           </p>
         </div>
 
