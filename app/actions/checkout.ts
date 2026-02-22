@@ -1,34 +1,32 @@
 "use server";
 
+import { parsePhoneNumber, CountryCode } from 'libphonenumber-js';
+
 export async function initiateChariowCheckout(formData: {
   product_id: string;
   email: string;
   full_name: string;
-  phone: string;
+  phone: string; // Reçoit le format E.164 (ex: +2376...)
+  promo_code: string; // Nouveau champ promo
 }) {
   const nameParts = formData.full_name.trim().split(" ");
   const first_name = nameParts[0] || "Client";
-  const last_name = nameParts.slice(1).join(" ") || "Dreno";
+  const last_name = nameParts.slice(1).join(" ") || "Elite";
 
-  // Nettoyage : on garde uniquement les chiffres
-  let cleanPhone = formData.phone.replace(/\D/g, "");
-  
-  // Logique de détection simple du code pays (Ex: 237 pour CM, 221 pour SN, 225 pour CI)
-  let countryCode = "SN"; // Par défaut
-  
-  if (cleanPhone.startsWith("237")) {
-    countryCode = "CM";
-    cleanPhone = cleanPhone.substring(3); // On enlève le 237 pour envoyer juste le numéro
-  } else if (cleanPhone.startsWith("225")) {
-    countryCode = "CI";
-    cleanPhone = cleanPhone.substring(3);
-  } else if (cleanPhone.startsWith("221")) {
-    countryCode = "SN";
-    cleanPhone = cleanPhone.substring(3);
-  } else if (cleanPhone.length > 9) {
-    // Si le numéro est long et qu'on n'a pas détecté le préfixe, 
-    // on peut laisser Chariow essayer de deviner ou forcer un code.
-    // Pour DrenoLearn, le mieux est de demander à l'utilisateur de choisir ou d'envoyer tel quel.
+  let cleanNumber = "";
+  let countryCode: CountryCode = "SN"; // Valeur de repli
+
+  try {
+    // 1. ANALYSE INTELLIGENTE DU NUMÉRO
+    // Grâce au format +XXX envoyé par ton nouveau champ, on extrait tout proprement
+    const phoneNumber = parsePhoneNumber(formData.phone);
+    if (phoneNumber) {
+      cleanNumber = phoneNumber.nationalNumber as string; // Le numéro sans le préfixe pays
+      countryCode = phoneNumber.country as CountryCode;  // Le code ISO (CM, SN, CI, etc.)
+    }
+  } catch (e) {
+    // Repli sécurisé si l'analyse échoue
+    cleanNumber = formData.phone.replace(/\D/g, "");
   }
 
   try {
@@ -39,14 +37,16 @@ export async function initiateChariowCheckout(formData: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        product_id: formData.product_id, // L'ID prd_ju2u42 est bien reçu ici désormais
+        product_id: formData.product_id,
         email: formData.email,
         first_name: first_name,
         last_name: last_name,
         phone: {
-          number: cleanPhone, // Le numéro sans le préfixe pays
-          country_code: countryCode, // Le code ISO (CM, SN, CI, etc.)
+          number: cleanNumber,
+          country_code: countryCode, // CM, SN, CI... détecté automatiquement
         },
+        // Transmission du code promo à l'API
+        promo_code: formData.promo_code || null, 
         redirect_url: `${process.env.NEXT_PUBLIC_APP_URL}/courses/success`,
       }),
     });
@@ -54,12 +54,13 @@ export async function initiateChariowCheckout(formData: {
     const result = await response.json();
 
     if (!response.ok) {
-      // On renvoie l'erreur précise de Chariow pour aider l'utilisateur
-      throw new Error(result.message || "Erreur de validation");
+      // On capture l'erreur spécifique pour l'afficher sur le design Premium
+      throw new Error(result.message || "La validation du paiement a échoué");
     }
 
     return { url: result.data.payment.checkout_url };
   } catch (error: any) {
+    console.error("Erreur Checkout Chariow:", error);
     return { error: error.message };
   }
 }

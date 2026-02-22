@@ -13,11 +13,7 @@ export default function CatalogPage() {
 
   return (
     <div className="space-y-6 md:space-y-10 pb-20">
-      {/* HEADER DE LA PAGE */}
-      <div className="px-2">
-        <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Nos Formations</h1>
-        <p className="text-xs md:text-sm text-slate-500 font-medium mt-1">Apprenez avec les meilleurs experts du continent.</p>
-      </div>
+     
 
       {/* BARRE DE RECHERCHE & FILTRES RAPIDES */}
       <div className="sticky top-20 z-20 flex flex-col gap-4 bg-white/90 backdrop-blur-md p-3 rounded-3xl md:rounded-4xl border border-slate-100 shadow-sm transition-all">

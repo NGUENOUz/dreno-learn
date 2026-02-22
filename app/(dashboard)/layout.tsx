@@ -1,79 +1,97 @@
 "use client";
-import { Sidebar } from "@/components/SiteBar"; 
-import {  ShoppingCart, LayoutDashboard, BookOpen, GraduationCap, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { motion} from "framer-motion";
 
-const NAV_ITEMS = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
-  { href: "/courses", icon: BookOpen, label: "Cours" },
-  { href: "/my-courses", icon: GraduationCap, label: "Mes cours" },
-  { href: "/favorites", icon: Heart, label: "Favoris" },
-];
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Sidebar } from "@/components/SiteBar"; 
+import { ShoppingCart, Bell, ChevronDown, LogOut, User, Search } from "lucide-react";
+import Link from "next/link"; // Correction de l'import Link (Next.js)
+import { useUserStore } from "@/store/useUserStore";
+import { useCartStore } from "@/store/useCartStore";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+
+const PAGE_META = {
+  "/dashboard": { title: "Tableau de bord", sub: "Gérez votre progression et vos succès" },
+  "/courses": { title: "Nos Formations", sub: "Apprenez avec les meilleurs experts du continent" },
+  "/my-courses": { title: "Mes Cours", sub: "Reprenez votre apprentissage là où vous l'avez laissé" },
+  "/favorites": { title: "Mes Favoris", sub: "Retrouvez vos formations préférées" },
+};
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { userData, clearUserData } = useUserStore();
+  const cartItems = useCartStore((state) => state.items);
+
+  useEffect(() => { setIsMounted(true); }, []);
+
+  const meta = PAGE_META[pathname] || { title: "Dreno Learn", sub: "La référence d'élite" };
+
+  if (!isMounted) return null;
 
   return (
-    <div className="flex min-h-screen bg-pattern-afro">
+    <div className="flex min-h-screen bg-slate-50/50 font-sans">
       <div className="hidden lg:flex"><Sidebar /></div>
       
-      <div className="flex-1 lg:ml-64 flex flex-col min-w-0 pb-20 lg:pb-0">
-        <header className="h-16 md:h-20 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
-           
-           {/* LOGO MOBILE VS BIENVENUE DESKTOP */}
-           <div className="flex items-center gap-3">
-              <Link href="/" className="flex lg:hidden items-center gap-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-200">
-                   <span className="text-white font-black text-lg">D</span>
-                </div>
-                <span className="text-xl font-black text-slate-900 tracking-tighter">Dreno<span className="text-blue-600">learn</span></span>
-              </Link>
-
-              {/* RESTAURATION DU MESSAGE DE BIENVENUE SUR DESKTOP */}
-              <div className="hidden lg:block">
-                <h2 className="text-xl font-black text-slate-900 leading-none">Bienvenue sur Dreno learn</h2>
-                <p className="text-xs text-slate-400 font-bold uppercase mt-1 tracking-wider">Explore nos meilleures formations</p>
-              </div>
+      <div className="flex-1 lg:ml-64 flex flex-col min-w-0">
+        <header className="h-24 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-30 px-6 md:px-10 flex items-center justify-between">
+            
+           {/* TITRE DYNAMIQUE ÉPURÉ */}
+           <div className="flex flex-col">
+              <h1 className="text-3xl font-black text-slate-900 tracking-tighter leading-none italic">
+                {meta.title}
+              </h1>
+              <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-2">
+                {meta.sub}
+              </p>
            </div>
 
-           <div className="flex items-center gap-2 md:gap-4">
-              <button className="p-2 text-slate-600 relative hover:text-blue-600 transition-colors">
-                <ShoppingCart className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white">0</span>
+           <div className="flex items-center gap-5">
+              {/* PANIER (0 par défaut) */}
+              <Link href="/cart" className="relative p-2.5 text-slate-400 hover:text-blue-600 transition-all">
+                <ShoppingCart className="w-6 h-6" />
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full border-2 border-white flex items-center justify-center">
+                  {cartItems.length}
+                </span>
+              </Link>
+
+              <button className="p-2.5 text-slate-400 hover:text-blue-600 hidden sm:block">
+                <Bell className="w-5 h-5" />
               </button>
-              
-              <div className="pl-2 sm:pl-4 border-l border-slate-100 ml-1">
-                <Button asChild className="h-9 sm:h-11 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-95 text-xs sm:text-sm">
+
+              <div className="h-8 w-px bg-slate-100 mx-1 md:mx-2" />
+
+              {/* LOGIQUE AUTH : Affiche Profil OU S'inscrire */}
+              {userData ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="outline-none">
+                    <div className="flex items-center gap-3 p-1.5 pr-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-slate-100 transition-all group">
+                      <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-blue-100 group-active:scale-95 transition-transform">
+                        {userData.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="hidden md:block text-left">
+                        <p className="text-sm font-bold text-slate-900 leading-none">{userData.name}</p>
+                        <p className="text-[9px] font-bold text-blue-600 uppercase mt-1 tracking-tighter">Membre Elite</p>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-60 mt-4 rounded-2xl p-2 shadow-2xl border-slate-50 bg-white">
+                     <DropdownMenuItem onClick={() => { clearUserData(); router.push("/login"); }} className="rounded-xl py-3 font-bold text-red-500 cursor-pointer focus:bg-red-50">
+                        <LogOut className="w-4 h-4 mr-3" /> Déconnexion
+                     </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl h-12 px-8 font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-100 transition-all active:scale-95">
                   <Link href="/register">S&apos;inscrire</Link>
                 </Button>
-              </div>
+              )}
            </div>
         </header>
 
-        <main className="p-4 md:p-8 grow">{children}</main>
-
-        {/* BOTTOM NAV SNAKE ANIMÉE */}
-        <nav className="lg:hidden fixed bottom-4 left-4 right-4 bg-white border border-slate-200/50 h-16 rounded-4xl flex items-center justify-around px-2 z-50 shadow-2xl">
-            {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link key={item.href} href={item.href} className="relative flex flex-col items-center justify-center w-14 h-full">
-                  {isActive && (
-                    <motion.div 
-                      layoutId="snake-nav"
-                      className="absolute -top-1 w-10 h-1 bg-blue-600 rounded-full shadow-[0_2px_8px_rgba(37,99,235,0.4)]"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
-                  <item.icon className={`w-5 h-5 transition-all duration-300 ${isActive ? "text-blue-600 scale-110" : "text-slate-400"}`} />
-                  <span className={`text-[10px] font-black mt-0.5 ${isActive ? "text-blue-600" : "text-slate-400"}`}>{item.label}</span>
-                </Link>
-              );
-            })}
-        </nav>
+        <main className="p-6 md:p-10 grow">{children}</main>
       </div>
     </div>
   );

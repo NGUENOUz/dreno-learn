@@ -1,6 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Toaster } from 'sonner';
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
         {/* On a retiré le Header d'ici */}
         {children}
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );
