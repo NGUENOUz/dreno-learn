@@ -59,6 +59,7 @@ export async function initiateChariowCheckout(formData: {
     }
 
     return { url: result.data.payment.checkout_url };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Erreur Checkout Chariow:", error);
     return { error: error.message };

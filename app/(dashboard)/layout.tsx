@@ -21,6 +21,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const { userData, clearUserData } = useUserStore();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cartItems = useCartStore((state: any) => state.items);
 
   const meta = PAGE_META[pathname] || { title: "Dreno Learn", sub: "La référence d'élite" };
