@@ -6,28 +6,28 @@ export async function initiateChariowCheckout(formData: {
   product_id: string;
   email: string;
   full_name: string;
-  phone: string; // Reçoit le format E.164 (ex: +2376...)
-  promo_code: string; // Nouveau champ promo
+  phone: string; 
+  promo_code: string; 
 }) {
   const nameParts = formData.full_name.trim().split(" ");
   const first_name = nameParts[0] || "Client";
   const last_name = nameParts.slice(1).join(" ") || "Elite";
 
   let cleanNumber = "";
-  let countryCode: CountryCode = "SN"; // Valeur de repli
+  let countryCode: CountryCode = "SN"; 
 
   try {
-    // 1. ANALYSE INTELLIGENTE DU NUMÉRO
-    // Grâce au format +XXX envoyé par ton nouveau champ, on extrait tout proprement
     const phoneNumber = parsePhoneNumber(formData.phone);
     if (phoneNumber) {
-      cleanNumber = phoneNumber.nationalNumber as string; // Le numéro sans le préfixe pays
-      countryCode = phoneNumber.country as CountryCode;  // Le code ISO (CM, SN, CI, etc.)
+      cleanNumber = phoneNumber.nationalNumber as string;
+      countryCode = phoneNumber.country as CountryCode;
     }
   } catch (e) {
-    // Repli sécurisé si l'analyse échoue
     cleanNumber = formData.phone.replace(/\D/g, "");
   }
+
+  // SÉCURITÉ : Vérifier que l'URL de base est bien définie
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://dreno-learn.vercel.app";
 
   try {
     const response = await fetch("https://api.chariow.com/v1/checkout", {
@@ -43,23 +43,25 @@ export async function initiateChariowCheckout(formData: {
         last_name: last_name,
         phone: {
           number: cleanNumber,
-          country_code: countryCode, // CM, SN, CI... détecté automatiquement
+          country_code: countryCode,
         },
-        // Transmission du code promo à l'API
-        promo_code: formData.promo_code || null, 
-        redirect_url: `${process.env.NEXT_PUBLIC_APP_URL}/courses/success`,
+        // 🚀 CORRECTION : Remplacement de promo_code par discount_code (selon la doc)
+        discount_code: formData.promo_code && formData.promo_code.trim() !== "" 
+          ? formData.promo_code.trim().toUpperCase() 
+          : null, 
+        
+        // 🚀 CORRECTION : Assurer une URL absolue pour éviter l'erreur de redirection
+        redirect_url: `${baseUrl}/courses/success`,
       }),
     });
 
     const result = await response.json();
 
     if (!response.ok) {
-      // On capture l'erreur spécifique pour l'afficher sur le design Premium
       throw new Error(result.message || "La validation du paiement a échoué");
     }
 
     return { url: result.data.payment.checkout_url };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Erreur Checkout Chariow:", error);
     return { error: error.message };
