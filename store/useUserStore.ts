@@ -1,13 +1,16 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
 interface UserState {
-  userData: {
-    name: string;
-    email: string;
-    phone: string;
-  } | null;
-  setUserData: (data: { name: string; email: string; phone: string }) => void;
+  userData: UserData | null;
+  setUserData: (data: UserData) => void;
   clearUserData: () => void;
 }
 
@@ -16,8 +19,12 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       userData: null,
       setUserData: (data) => set({ userData: data }),
-      clearUserData: () => set({ userData: null }),
+      clearUserData: () => {
+        set({ userData: null });
+        // Optionnel : vider aussi le panier à la déconnexion
+        // useCartStore.getState().clearCart(); 
+      },
     }),
-    { name: 'drenolearn-user-storage' } // Sauvegardé dans le localStorage
+    { name: 'drenolearn-user-session' }
   )
 );

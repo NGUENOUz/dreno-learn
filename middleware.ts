@@ -3,7 +3,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
-    request: { headers: request.headers },
+    request: {
+      headers: request.headers,
+    },
   })
 
   const supabase = createServerClient(
@@ -11,29 +13,43 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return request.cookies.getAll() },
+        getAll() {
+          return request.cookies.getAll()
+        },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-          response = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          response = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
         },
       },
     }
   )
 
-  // Utilisation de getUser() pour plus de sécurité contre la falsification de cookies
+  // 1. VÉRIFICATION DE SÉCURITÉ : On utilise getUser() et non getSession()
+  // Cela force une vérification réelle auprès de Supabase pour éviter les cookies fantômes.
   const { data: { user } } = await supabase.auth.getUser()
+
   const url = request.nextUrl.clone()
 
-  // 1. PROTECTION : Rediriger vers /login si on tente d'accéder au privé sans session
-  if (!user && (url.pathname.startsWith('/dashboard') || url.pathname.startsWith('/my-courses'))) {
+  // 2. PROTECTION DES ROUTES PRIVÉES
+  const isProtectedRoute = 
+    url.pathname.startsWith('/dashboard') || 
+    url.pathname.startsWith('/my-courses') || 
+    url.pathname.startsWith('/favorites')
+
+  if (!user && isProtectedRoute) {
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // 2. LOGIQUE CONNECTÉ : Rediriger vers /dashboard SEULEMENT si on est sur login/register
-  // Cela permet d'accéder au catalogue (/courses) librement même connecté
-  if (user && (url.pathname === '/login' || url.pathname === '/register')) {
+  // 3. REDIRECTION SI DÉJÀ CONNECTÉ
+  // Si l'utilisateur est connecté et essaie d'aller sur Login ou Register, on l'envoie au Dashboard.
+  const isAuthPage = url.pathname === '/login' || url.pathname === '/register'
+  if (user && isAuthPage) {
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
@@ -41,6 +57,10 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
+// 4. CONFIGURATION DU MATCHER
+// On exclut les fichiers statiques, les images et l'api pour ne pas ralentir le site.
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)'],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)',
+  ],
 }
