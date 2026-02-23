@@ -50,7 +50,7 @@ export default function LoginPage() {
         setUserData({
           name: authData.user.user_metadata?.full_name || "Utilisateur",
           email: authData.user.email || "",
-          phone: authData.user.user_metadata?.phone || "",
+          id:authData.user.id || ""
         });
 
         // UTILISATION DE WINDOW.LOCATION POUR FORCER LE MIDDLEWARE À LIRE LE COOKIE
