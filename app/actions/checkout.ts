@@ -14,7 +14,7 @@ export async function initiateChariowCheckout(formData: {
   const last_name = nameParts.slice(1).join(" ") || "Elite";
 
   let cleanNumber = "";
-  let countryCode: CountryCode = "SN"; 
+  let countryCode: CountryCode = "CM"; // Par défaut Cameroun selon ta capture
 
   try {
     const phoneNumber = parsePhoneNumber(formData.phone);
@@ -26,7 +26,7 @@ export async function initiateChariowCheckout(formData: {
     cleanNumber = formData.phone.replace(/\D/g, "");
   }
 
-  // SÉCURITÉ : Vérifier que l'URL de base est bien définie
+  // FORCE L'URL ABSOLUE (Règle l'erreur de ta 2ème capture)
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://dreno-learn.vercel.app";
 
   try {
@@ -45,12 +45,8 @@ export async function initiateChariowCheckout(formData: {
           number: cleanNumber,
           country_code: countryCode,
         },
-        // 🚀 CORRECTION : Remplacement de promo_code par discount_code (selon la doc)
-        discount_code: formData.promo_code && formData.promo_code.trim() !== "" 
-          ? formData.promo_code.trim().toUpperCase() 
-          : null, 
-        
-        // 🚀 CORRECTION : Assurer une URL absolue pour éviter l'erreur de redirection
+        // ✅ CORRECTION : Utilisation de discount_code selon la doc Chariow
+        discount_code: formData.promo_code ? formData.promo_code.trim().toUpperCase() : null, 
         redirect_url: `${baseUrl}/courses/success`,
       }),
     });
@@ -58,12 +54,21 @@ export async function initiateChariowCheckout(formData: {
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.message || "La validation du paiement a échoué");
+      // Renvoie l'erreur propre de l'API ou un message par défaut
+      return { error: result.message || "La validation du paiement a échoué" };
     }
 
-    return { url: result.data.payment.checkout_url };
+    // ✅ CORRECTION : Accès sécurisé à l'URL (vérifie si c'est .data.checkout_url ou .data.payment.checkout_url)
+    const checkoutUrl = result.data?.checkout_url || result.data?.payment?.checkout_url;
+    
+    if (!checkoutUrl) {
+        return { error: "Impossible de générer l'URL de paiement. Vérifiez votre configuration Chariow." };
+    }
+
+    return { url: checkoutUrl };
+
   } catch (error: any) {
     console.error("Erreur Checkout Chariow:", error);
-    return { error: error.message };
+    return { error: error.message || "Une erreur inattendue est survenue" };
   }
 }
