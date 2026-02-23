@@ -36,6 +36,7 @@ export default function LoginPage() {
     },
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (values: any) => {
     setIsLoading(true);
     setServerError(null);
@@ -57,6 +58,7 @@ export default function LoginPage() {
         // UTILISATION DE WINDOW.LOCATION POUR FORCER LE MIDDLEWARE À LIRE LE COOKIE
         window.location.href = "/dashboard";
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const errorMsg = error.message.toLowerCase();
       

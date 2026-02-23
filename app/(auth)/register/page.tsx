@@ -41,6 +41,7 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (values: any) => {
     setIsLoading(true);
     setServerError(null);

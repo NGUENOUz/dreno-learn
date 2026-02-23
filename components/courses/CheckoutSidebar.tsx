@@ -29,6 +29,7 @@ export function CheckoutSidebar({ isOpen, onClose, course }: CheckoutModalProps)
       email: formData.email,
       full_name: formData.name,
       phone: formData.phone,
+      promo_code: ""
     });
 
     if (result.url) {
