@@ -53,6 +53,7 @@ export default function RegisterPage() {
           name: values.fullName,
           email: values.email,
           phone: values.phone,
+          id:values.id
         });
 
         // Affichage de l'état de succès (Vérification email)
