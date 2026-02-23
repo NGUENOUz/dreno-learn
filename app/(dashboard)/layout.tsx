@@ -18,17 +18,12 @@ const PAGE_META = {
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { userData, clearUserData } = useUserStore();
-  const cartItems = useCartStore((state) => state.items);
-
-  useEffect(() => { setIsMounted(true); }, []);
+  const cartItems = useCartStore((state: any) => state.items);
 
   const meta = PAGE_META[pathname] || { title: "Dreno Learn", sub: "La référence d'élite" };
-
-  if (!isMounted) return null;
 
   return (
     <div className="flex min-h-screen bg-slate-50/50 font-sans">
