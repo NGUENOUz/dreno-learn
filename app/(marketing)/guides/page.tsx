@@ -9,13 +9,13 @@ import {
 import Link from "next/link";
 import GuideCard from "@/components/guides/guidesCard";
 import { Button } from "@/components/ui/button";
-import MOCK_GUIDES from "@/app/mockData/mock";
 
 export default async function GuidesMarketplace({
   searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  // --- CONFIGURATION SUPABASE ---
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,26 +23,31 @@ export default async function GuidesMarketplace({
     { cookies: { getAll() { return cookieStore.getAll(); } } }
   );
 
-  // --- LOGIQUE DE FILTRAGE ---
+  // --- LOGIQUE DE FILTRAGE & PAGINATION ---
   const query = (searchParams.query as string) || "";
   const category = (searchParams.category as string) || "all";
   const page = Number(searchParams.page) || 1;
   const itemsPerPage = 6;
 
-//   let supabaseQuery = supabase
-//     .from("guides")
-//     .select("*", { count: "exact" })
-//     .eq("is_published", true);
+  let supabaseQuery = supabase
+    .from("guides")
+    .select("*", { count: "exact" })
+    .eq("is_published", true);
 
-//   if (query) supabaseQuery = supabaseQuery.ilike("title", `%${query}%`);
-//   if (category !== "all") supabaseQuery = supabaseQuery.eq("category", category);
+  if (query) {
+    supabaseQuery = supabaseQuery.ilike("title", `%${query}%`);
+  }
+  
+  if (category !== "all") {
+    supabaseQuery = supabaseQuery.eq("category", category);
+  }
 
-//   const { data: guides, count } = await supabaseQuery
-//     .order("created_at", { ascending: false })
-//     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
+  const { data: guides, count } = await supabaseQuery
+    .order("created_at", { ascending: false })
+    .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
 
-//   const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
-  const guides = MOCK_GUIDES;
+  const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
+
   return (
     <div className="min-h-screen bg-[#FDFDFD]">
       
@@ -98,9 +103,11 @@ export default async function GuidesMarketplace({
                 className="h-14 px-6 bg-transparent font-black uppercase text-[10px] tracking-widest text-slate-500 outline-none cursor-pointer"
               >
                 <option value="all">Toutes Catégories</option>
-                <option value="etudiant">Étudiant</option>
-                <option value="travail">Travail / Business</option>
-                <option value="tourisme">Tourisme</option>
+                <option value="Guide Complet">💎 Guide Complet</option>
+                <option value="Études">🎓 Études</option>
+                <option value="Travail">💼 Travail</option>
+                <option value="Visiteur">✈️ Visiteur</option>
+                <option value="Investissement">💰 Investissement</option>
               </select>
 
               <Button type="submit" className="h-14 px-10 bg-slate-950 hover:bg-blue-600 rounded-[1.5rem] font-black italic uppercase text-xs transition-all">
@@ -116,13 +123,28 @@ export default async function GuidesMarketplace({
         {guides && guides.length > 0 ? (
           <div className="space-y-16">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-              {guides.map((guide) => (
-                <GuideCard key={guide.id} guide={guide} />
-              ))}
+              {guides.map((guide) => {
+                // 📊 Calcul du pourcentage de réduction en temps réel
+                const discountBadge = guide.old_price 
+                  ? Math.round(((guide.old_price - guide.price) / guide.old_price) * 100)
+                  : null;
+
+                return (
+                  <GuideCard 
+                    key={guide.id} 
+                    guide={{
+                      ...guide,
+                      discountPercentage: discountBadge, // On injecte le % calculé
+                      // On s'assure que oldPrice est bien passé au composant
+                      oldPrice: guide.old_price 
+                    }} 
+                  />
+                );
+              })}
             </div>
 
             {/* PAGINATION ÉLITE */}
-            {/* {totalPages > 1 && (
+            {totalPages > 1 && (
               <div className="flex items-center justify-center gap-4 pt-10">
                 <Button 
                   disabled={page <= 1} 
@@ -164,7 +186,7 @@ export default async function GuidesMarketplace({
                   ) : <ChevronRight className="w-5 h-5" />}
                 </Button>
               </div>
-            )} */}
+            )}
           </div>
         ) : (
           <div className="py-32 text-center bg-slate-50 rounded-[4rem] border-2 border-dashed border-slate-100 space-y-6">

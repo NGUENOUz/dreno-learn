@@ -41,14 +41,15 @@ export default function GuideCard({ guide }: GuideCardProps) {
     >
       {/* SECTION IMAGE & BADGES */}
       <div className="relative h-64 w-full overflow-hidden p-3">
-        <div className="relative h-full w-full rounded-[2rem] overflow-hidden shadow-inner">
+        <div className="relative h-full w-full rounded-4xl overflow-hidden shadow-inner">
           <Image
             src={guide.image_url || "/images/placeholder-travel.jpg"}
             alt={guide.title}
             fill
             className="object-cover group-hover:scale-110 transition-transform duration-700"
+            unoptimized
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
           
           {/* Badge Catégorie */}
           <div className="absolute top-4 left-4 flex gap-2">
@@ -78,7 +79,7 @@ export default function GuideCard({ guide }: GuideCardProps) {
       </div>
 
       {/* CONTENU TEXTUEL */}
-      <div className="p-6 pt-2 space-y-4 flex-grow">
+      <div className="p-6 pt-2 space-y-4 grow">
         {/* L'argument massue : L'économie réalisée */}
         <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-xl border border-green-100 w-full">
           <TrendingDown className="w-4 h-4" />
@@ -106,7 +107,7 @@ export default function GuideCard({ guide }: GuideCardProps) {
         <div className="flex items-center justify-between mb-4 px-1">
           <div className="flex flex-col">
             {guide.oldPrice && (
-              <span className="text-slate-300 text-xs font-bold line-through">
+              <span className="text-xs font-bold text-red-500 line-through opacity-80">
                 {guide.oldPrice.toLocaleString()} FCFA
               </span>
             )}

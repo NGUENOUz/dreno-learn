@@ -8,7 +8,7 @@ const MOCK_GUIDES = [
     description: "Obtenez votre visa pour les Émirats en moins de 72h. Ce guide vous donne les plateformes officielles et évite les commissions inutiles.",
     price: 15000,
     oldPrice: 35000,
-    image_url: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=800",
+    image_url: "https://res.cloudinary.com/dcsl6xhli/image/upload/v1772029896/cover1_dh3omo.png",
     savings_text: "Économisez 85 000 FCFA de frais d'agence",
     category: "tourisme",
     is_published: true,

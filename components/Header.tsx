@@ -4,8 +4,8 @@ import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
-  Search, ShoppingCart, Menu, Heart, ChevronDown, 
-  LogOut, User, Bell, Globe, LayoutGrid, HelpCircle, 
+  Search, ShoppingCart, Menu, ChevronDown, 
+  LogOut, User, Globe, LayoutGrid,
   ShieldCheck // <-- Il manquait celui-là !
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,7 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-[100] w-full border-b border-slate-100 bg-white/80 backdrop-blur-xl transition-all duration-300">
+    <header className="sticky top-0 z-100 w-full border-b border-slate-100 bg-white/80 backdrop-blur-xl transition-all duration-300">
       <div className="container mx-auto px-6 h-20 flex items-center justify-between max-w-7xl">
         
         {/* --- LOGO ELITE --- */}
@@ -101,7 +101,7 @@ export function Header() {
               <Link href="/cart" className="p-2.5 text-slate-400 hover:text-blue-600 transition-all rounded-xl hover:bg-slate-50 relative group">
                 <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 {cartItems.length > 0 && (
-                  <span className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[9px] font-black flex items-center justify-center rounded-full border-2 border-white animate-in zoom-in">
+                  <span className="absolute top-1 right-1 min-w-4.5 h-4.5 bg-red-500 text-white text-[9px] font-black flex items-center justify-center rounded-full border-2 border-white animate-in zoom-in">
                     {cartItems.length}
                   </span>
                 )}
@@ -120,7 +120,7 @@ export function Header() {
                     {userData.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="hidden md:block text-left">
-                    <p className="text-[11px] font-black text-slate-900 leading-none truncate max-w-[100px] uppercase italic">
+                    <p className="text-[11px] font-black text-slate-900 leading-none truncate max-w-25 uppercase italic">
                       {userData.name}
                     </p>
                     <p className="text-[9px] font-bold text-blue-600 mt-1 uppercase tracking-tighter flex items-center gap-1">
@@ -130,7 +130,7 @@ export function Header() {
                   <ChevronDown className="w-4 h-4 text-slate-300 group-hover:text-blue-600 transition-colors" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 mt-4 rounded-[1.5rem] p-2 shadow-2xl border-slate-100 bg-white ring-1 ring-black/5">
+              <DropdownMenuContent align="end" className="w-64 mt-4 rounded-3xl p-2 shadow-2xl border-slate-100 bg-white ring-1 ring-black/5">
                 <div className="px-4 py-3 border-b border-slate-50 mb-1">
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Espace Personnel</p>
                 </div>
@@ -169,7 +169,7 @@ export function Header() {
                   <Menu className="w-6 h-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:w-[380px] bg-white border-l-0 p-0 overflow-hidden flex flex-col">
+              <SheetContent side="right" className="w-full sm:w-95 bg-white border-l-0 p-0 overflow-hidden flex flex-col">
                 <div className="p-8 border-b border-slate-50">
                   <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-slate-950 rounded-xl flex items-center justify-center text-white font-black italic">D</div>
@@ -217,7 +217,7 @@ export function Header() {
                     </div>
                   )}
                   <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] pt-2">
-                    L'excellence pour votre avenir
+                    L&apos;excellence pour votre avenir
                   </p>
                 </div>
               </SheetContent>
