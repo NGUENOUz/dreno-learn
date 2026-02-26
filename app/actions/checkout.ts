@@ -2,21 +2,34 @@
 
 import { parsePhoneNumber, CountryCode } from 'libphonenumber-js';
 
+/**
+ * ACTION DE CHECKOUT SÉCURISÉE
+ * Gère l'initiation du paiement via Chariow et configure les redirections de succès.
+ */
 export async function initiateChariowCheckout(formData: {
-  product_id: string;
+  product_id: string; // ID Chariow (ex: nouveau-guide-2026)
   email: string;
   full_name: string;
   phone: string;
   promo_code: string;
-  product_type?: "guide" | "course"; // ✅ Nouveau paramètre optionnel
+  product_type: "courses" | "guides";
 }) {
-  const nameParts = formData.full_name.trim().split(" ");
+  // 1. Nettoyage strict des entrées
+  const cleanProductId = String(formData.product_id).trim();
+  const cleanEmail = String(formData.email).trim();
+  const cleanFullName = String(formData.full_name).trim();
+
+  console.log("=== CHECKOUT SECURE START ===");
+  console.log("ID Produit identifié :", cleanProductId);
+
+  // 2. Préparation de l'identité client
+  const nameParts = cleanFullName.split(" ");
   const first_name = nameParts[0] || "Client";
   const last_name = nameParts.slice(1).join(" ") || "Elite";
 
-  let cleanNumber = "";
+  // 3. Formatage du numéro de téléphone pour Chariow
+  let cleanNumber = formData.phone.replace(/\D/g, "");
   let countryCode: CountryCode = "CM"; 
-
   try {
     const phoneNumber = parsePhoneNumber(formData.phone);
     if (phoneNumber) {
@@ -24,25 +37,32 @@ export async function initiateChariowCheckout(formData: {
       countryCode = phoneNumber.country as CountryCode;
     }
   } catch (e) {
-    cleanNumber = formData.phone.replace(/\D/g, "");
+    console.error("Erreur formatage téléphone:", e);
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://dreno-learn.vercel.app";
+  // 4. Construction de l'URL de retour dynamique vers la page de succès
+  const rawBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://dreno-learn.vercel.app";
+  const baseUrl = rawBaseUrl.replace(/\/$/, ""); 
   
-  // ✅ LOGIQUE DE REDIRECTION DYNAMIQUE
-  // Si c'est un guide, on va vers /checkout/success, sinon vers /courses/success
-  const successPath = formData.product_type === "guide" ? "/guides/success" : "/courses/success";
+  // FIX CRITIQUE : On utilise la nouvelle route hors du dossier dynamique !
+  // Assurez-vous d'avoir renommé votre dossier "success" en "guide-success"
+  const successPath = formData.product_type === "guides" ? "/guide-success" : "/course-success";
 
+  // IMPORTANT : On s'assure de passer chariow_id
   const successParams = new URLSearchParams({
-    chariow_id: formData.product_id, // ✅ On passe l'ID pour que la page de succès récupère le bon guide
-    email: formData.email,
-    name: formData.full_name,
-    phone: formData.phone
+    email: cleanEmail,
+    name: cleanFullName,
+    phone: formData.phone,
+    chariow_id: cleanProductId, // C'est ici qu'on injecte l'ID exact
+    type: formData.product_type
   }).toString();
 
   const finalRedirectUrl = `${baseUrl}${successPath}?${successParams}`;
+  
+  console.log("🔗 [CHECKOUT] URL de retour générée :", finalRedirectUrl);
 
   try {
+    // 5. Appel à l'API Chariow pour créer la session de paiement
     const response = await fetch("https://api.chariow.com/v1/checkout", {
       method: "POST",
       headers: {
@@ -50,8 +70,8 @@ export async function initiateChariowCheckout(formData: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        product_id: formData.product_id,
-        email: formData.email,
+        product_id: cleanProductId,
+        email: cleanEmail,
         first_name: first_name,
         last_name: last_name,
         phone: {
@@ -66,20 +86,25 @@ export async function initiateChariowCheckout(formData: {
     const result = await response.json();
 
     if (!response.ok) {
-      return { error: result.message || "La validation du paiement a échoué" };
+      console.error("API Error:", result);
+      return { error: result.message || "Erreur lors de l'initiation" };
     }
 
     const checkoutUrl = result.data?.checkout_url || result.data?.payment?.checkout_url;
     const isCompleted = result.data?.status === 'completed' || result.data?.payment?.status === 'completed';
 
+    // 6. Gestion du cas "Déjà payé" ou "Code Promo 100%"
+    // Si le statut est déjà complété, on redirige directement vers notre page de succès locale
     if (isCompleted || !checkoutUrl) {
+        console.log("✅ [CHECKOUT] Paiement instantané validé, redirection locale.");
         return { url: finalRedirectUrl };
     }
 
+    // Sinon, on renvoie l'URL de la page de paiement Chariow
     return { url: checkoutUrl };
 
   } catch (error: any) {
-    console.error("Erreur critique Checkout Chariow:", error);
-    return { error: "Une erreur est survenue lors de l'initialisation du paiement" };
+    console.error("Critical Error:", error);
+    return { error: "Erreur technique serveur" };
   }
 }

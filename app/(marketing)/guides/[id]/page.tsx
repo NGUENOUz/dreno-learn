@@ -112,7 +112,7 @@ const EliteCard = ({
 
 export default function GuideDetailsPage() {
   const params = useParams();
-  const slug = params.slug;
+  const id = params.id;
   const [guide, setGuide] = useState<any>(null);
   const [relatedGuides, setRelatedGuides] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -162,7 +162,7 @@ export default function GuideDetailsPage() {
         const { data: current, error } = await supabase
           .from("guides")
           .select("*")
-          .eq("slug", slug)
+          .eq("slug", id)
           .single();
 
         if (error) throw error;
@@ -172,7 +172,7 @@ export default function GuideDetailsPage() {
         const { data: others } = await supabase
           .from("guides")
           .select("*")
-          .neq("slug", slug)
+          .neq("slug", id)
           .limit(6);
         if (others) setRelatedGuides(others);
       } catch (err) {
@@ -181,8 +181,8 @@ export default function GuideDetailsPage() {
         setIsLoading(false);
       }
     };
-    if (slug) fetchData();
-  }, [slug, supabase]);
+    if (id) fetchData();
+  }, [id, supabase]);
 
   useEffect(() => {
     const handleScroll = () => setShowStickyCTA(window.scrollY > 700);

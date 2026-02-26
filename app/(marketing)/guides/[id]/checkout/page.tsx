@@ -8,17 +8,21 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { initiateChariowCheckout } from "@/app/actions/checkout";
+import { createBrowserClient } from "@supabase/ssr";
 
 // Import pour le champ téléphone intelligent
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css'; 
 
-export default function CheckoutPage() {
+export default function GuideCheckoutPage() {
   const router = useRouter();
   const params = useParams();
-  const productId = params.id as string;
+  
+  // L'ID dans l'URL (chariow_id)
+  const guideId = params.id as string;
 
   const [loading, setLoading] = useState(false);
+  const [guide, setGuide] = useState<any>(null);
   const [phoneValue, setPhoneValue] = useState<string | undefined>();
   const [formData, setFormData] = useState({ 
     name: "", 
@@ -26,23 +30,43 @@ export default function CheckoutPage() {
     promoCode: "" 
   });
 
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // Charger les informations du guide pour l'affichage
+  useEffect(() => {
+    const fetchGuide = async () => {
+      const { data } = await supabase
+        .from("guides")
+        .select("*")
+        .eq("chariow_id", guideId)
+        .single();
+
+      if (data) setGuide(data);
+    };
+    if (guideId) fetchGuide();
+  }, [guideId, supabase]);
+
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.email || !phoneValue || !formData.name || !productId) {
+    
+    if (!formData.email || !phoneValue || !formData.name || !guideId) {
       alert("Informations manquantes");
       return;
     }
     
     setLoading(true);
     
+    // ✅ Appel à l'action : redirection vers /guides/success
     const result = await initiateChariowCheckout({
-      product_id: productId,
+      product_id: guide?.chariow_id || guideId,
       email: formData.email,
       full_name: formData.name,
-      phone: phoneValue, // Envoi du numéro formaté internationalement
+      phone: phoneValue,
       promo_code: formData.promoCode,
-      product_type:"courses"
-      
+      product_type: "guides" // L'action saura qu'il faut aller vers /guides/success
     });
 
     if (result.url) {
@@ -53,11 +77,19 @@ export default function CheckoutPage() {
     }
   };
 
+  if (!guide && guideId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white md:bg-slate-50 flex items-center justify-center p-0 md:p-6 font-sans">
       <div className="w-full max-w-5xl bg-white md:rounded-[3rem] md:shadow-2xl md:shadow-blue-900/10 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
         
-        {/* --- SECTION RÉCAPITULATIF (GAUCHE) - Masquée sur mobile --- */}
+        {/* --- SECTION RÉCAPITULATIF (GAUCHE) --- */}
         <div className="hidden md:flex w-full md:w-[40%] bg-slate-900 text-white p-12 flex-col justify-between relative">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[100px]" />
           
@@ -79,8 +111,12 @@ export default function CheckoutPage() {
 
               <div className="space-y-4 pt-6">
                 <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Votre commande</p>
-                <h2 className="text-3xl font-black italic tracking-tighter leading-tight uppercase">Validation des accès VIP</h2>
-                <p className="text-sm text-slate-400 font-medium">Rejoignez l'élite des entrepreneurs africains dès aujourd'hui.</p>
+                <h2 className="text-3xl font-black italic tracking-tighter leading-tight uppercase">
+                  {guide?.title || "Validation des accès VIP"}
+                </h2>
+                <p className="text-sm text-slate-400 font-medium">
+                  Arsenal stratégique prêt pour envoi immédiat.
+                </p>
               </div>
             </div>
           </div>
@@ -94,23 +130,13 @@ export default function CheckoutPage() {
         {/* --- SECTION FORMULAIRE (DROITE) --- */}
         <div className="flex-1 p-6 md:p-16 bg-white flex flex-col justify-center">
           <div className="max-w-md mx-auto w-full space-y-8">
-            
-            {/* Header Mobile Uniquement */}
-            <div className="md:hidden flex flex-col items-center text-center space-y-4 mb-4">
-               <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-100">
-                  <ShoppingBag className="text-white w-7 h-7" />
-               </div>
-               <h2 className="text-2xl font-black italic tracking-tighter text-slate-900">FINALISER MES ACCÈS</h2>
-            </div>
-
             <div className="hidden md:block space-y-2">
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Informations de livraison</h2>
-              <p className="text-xs text-slate-400 font-medium">Remplissez ces champs pour débloquer votre formation.</p>
+              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Réception du Guide</h2>
+              <p className="text-xs text-slate-400 font-medium">Vos accès seront envoyés à ces coordonnées.</p>
             </div>
 
             <form onSubmit={handlePayment} className="space-y-5">
               <div className="space-y-4">
-                {/* NOM */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest ml-1">Nom Complet</label>
                   <input 
@@ -122,25 +148,22 @@ export default function CheckoutPage() {
                   />
                 </div>
 
-                {/* CHAMP TÉLÉPHONE AVEC DRAPEAU */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase text-blue-600 tracking-widest ml-1 flex items-center gap-2">
-                    <MessageSquare className="w-3 h-3" /> Numéro WhatsApp (Accès Groupes VIP)
+                    <MessageSquare className="w-3 h-3" /> Numéro WhatsApp
                   </label>
                   <div className="phone-elite-container">
                     <PhoneInput
                       international
-                      defaultCountry="CM" // Par défaut Cameroun, mais détecte l'IP auto
+                      defaultCountry="CM"
                       value={phoneValue}
                       onChange={setPhoneValue}
                       placeholder="Votre numéro WhatsApp"
                       className="w-full h-14 px-5 rounded-2xl border border-slate-100 bg-slate-50 font-semibold text-sm focus-within:ring-4 focus-within:ring-blue-600/5 focus-within:border-blue-600 transition-all"
                     />
                   </div>
-                  <p className="text-[9px] text-slate-400 font-bold italic ml-1 uppercase">Indispensable pour l'ajout automatique dans nos groupes privés.</p>
                 </div>
 
-                {/* EMAIL */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest ml-1">Email de réception</label>
                   <input 
@@ -153,7 +176,6 @@ export default function CheckoutPage() {
                   />
                 </div>
 
-                {/* PROMO */}
                 <div className="space-y-2 pt-2">
                   <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest ml-1">Code Promo</label>
                   <div className="relative group">
@@ -161,7 +183,7 @@ export default function CheckoutPage() {
                     <input 
                       value={formData.promoCode}
                       onChange={(e) => setFormData({...formData, promoCode: e.target.value.toUpperCase()})}
-                      placeholder="MON-REDUC-2026"
+                      placeholder="CODE-REDUC"
                       className="w-full h-14 pl-12 pr-6 rounded-2xl border border-slate-100 bg-slate-50 font-bold text-xs tracking-widest focus:border-blue-600 outline-none transition-all"
                     />
                   </div>
@@ -172,7 +194,7 @@ export default function CheckoutPage() {
                 <Button 
                   type="submit"
                   disabled={loading}
-                  className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl text-md shadow-2xl shadow-blue-100 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-70 group"
+                  className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl text-md shadow-2xl shadow-blue-100 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-70 group"
                 >
                   {loading ? (
                     <Loader2 className="w-6 h-6 animate-spin text-white" />
