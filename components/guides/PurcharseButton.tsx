@@ -16,7 +16,8 @@ export default function PurchaseButton({ productId, email }: { productId: string
       email: email || "", // Idéalement récupéré de la session
       full_name: "Client Elite",
       phone: "",
-      promo_code: ""
+      promo_code: "",
+      product_type:"guides"
     });
 
     if (result.error) {
