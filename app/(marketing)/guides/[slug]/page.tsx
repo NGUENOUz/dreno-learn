@@ -33,7 +33,13 @@ import { createBrowserClient } from "@supabase/ssr";
  * COMPOSANT : EliteCard
  * La carte d'achat principale, utilisée en haut sur mobile et en sticky sur desktop
  */
-const EliteCard = ({ guide, isMobileFlow = false }: { guide: any; isMobileFlow?: boolean }) => (
+const EliteCard = ({
+  guide,
+  isMobileFlow = false,
+}: {
+  guide: any;
+  isMobileFlow?: boolean;
+}) => (
   <div
     className={`bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_30px_60px_rgba(0,0,0,0.08)] p-8 space-y-6 overflow-hidden relative w-full ${
       isMobileFlow ? "lg:hidden mb-12" : ""
@@ -60,10 +66,11 @@ const EliteCard = ({ guide, isMobileFlow = false }: { guide: any; isMobileFlow?:
       asChild
       className="w-full h-16 bg-[#2563EB] hover:bg-blue-700 text-white font-black rounded-2xl text-lg shadow-xl shadow-blue-200 group relative overflow-hidden border-none cursor-pointer transition-all active:scale-95"
     >
-      <Link href={`/checkout/${guide.chariow_id}`}>
+      <Link href={`/guides/${guide.chariow_id}/checkout`}>
         <span className="flex items-center justify-center w-full h-full">
           <span className="relative z-10 flex items-center gap-2 uppercase italic tracking-tighter">
-            Obtenir mon Guide <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            Obtenir mon Guide{" "}
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </span>
           <motion.div
             className="absolute inset-0 bg-white/20"
@@ -76,11 +83,26 @@ const EliteCard = ({ guide, isMobileFlow = false }: { guide: any; isMobileFlow?:
 
     <div className="space-y-4 pt-6 border-t border-slate-50 relative z-10">
       {[
-        { icon: ShieldCheck, text: "Garantie Mise à jour 2026", color: "text-blue-600" },
-        { icon: MessageSquare, text: "Accès au Groupe WhatsApp VIP", color: "text-green-500" },
-        { icon: Download, text: "PDF + Modèles de Lettres", color: "text-blue-600" },
+        {
+          icon: ShieldCheck,
+          text: "Garantie Mise à jour 2026",
+          color: "text-blue-600",
+        },
+        {
+          icon: MessageSquare,
+          text: "Accès au Groupe WhatsApp VIP",
+          color: "text-green-500",
+        },
+        {
+          icon: Download,
+          text: "PDF + Modèles de Lettres",
+          color: "text-blue-600",
+        },
       ].map((item, i) => (
-        <div key={i} className="flex items-center gap-3 text-xs font-bold text-slate-700">
+        <div
+          key={i}
+          className="flex items-center gap-3 text-xs font-bold text-slate-700"
+        >
           <item.icon className={`w-4 h-4 shrink-0 ${item.color}`} /> {item.text}
         </div>
       ))}
@@ -99,7 +121,7 @@ export default function GuideDetailsPage() {
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   );
 
   const testimonials = [
@@ -187,7 +209,6 @@ export default function GuideDetailsPage() {
 
   return (
     <div className="relative w-full max-w-7xl mx-auto pb-24 lg:pb-10 px-4 md:px-6 pt-10">
-      
       {/* 1. STICKY HEADER CTA (DESKTOP) */}
       <AnimatePresence>
         {showStickyCTA && (
@@ -200,7 +221,12 @@ export default function GuideDetailsPage() {
             <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-6">
               <div className="flex items-center gap-4">
                 <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-slate-100">
-                  <Image src={guide.image_url} fill className="object-cover" alt="mini" />
+                  <Image
+                    src={guide.image_url}
+                    fill
+                    className="object-cover"
+                    alt="mini"
+                  />
                 </div>
                 <h4 className="text-sm font-black text-slate-900 uppercase italic line-clamp-1">
                   {guide.title}
@@ -210,7 +236,9 @@ export default function GuideDetailsPage() {
                 asChild
                 className="h-12 bg-blue-600 px-8 rounded-xl font-black italic uppercase text-xs shadow-lg shadow-blue-200"
               >
-                <Link href={`/checkout/${guide.chariow_id}`}>Accéder au guide</Link>
+                <Link href={`/guides/${guide.chariow_id}/checkout`}>
+                  Accéder au guide
+                </Link>
               </Button>
             </div>
           </motion.div>
@@ -219,7 +247,13 @@ export default function GuideDetailsPage() {
 
       {/* 2. HERO BANNER */}
       <section className="relative w-full h-[55vh] md:h-[65vh] rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden shadow-2xl mb-8 group">
-        <Image src={guide.image_url} fill className="w-full h-full object-cover" alt={guide.title} priority />
+        <Image
+          src={guide.image_url}
+          fill
+          className="w-full h-full object-cover"
+          alt={guide.title}
+          priority
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
         <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16 space-y-6">
           <div className="flex flex-wrap gap-3">
@@ -249,7 +283,8 @@ export default function GuideDetailsPage() {
             </div>
             <div className="flex items-center gap-5 text-white/90 text-sm font-bold shrink-0">
               <div className="flex items-center gap-1.5">
-                <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" /> 4.9 (450 avis)
+                <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" /> 4.9
+                (450 avis)
               </div>
               <div className="flex items-center gap-1.5 bg-blue-500/20 px-4 py-2 rounded-xl border border-blue-500/30">
                 <ShieldCheck className="w-4 h-4 text-blue-400" /> Sans Agence
@@ -266,13 +301,24 @@ export default function GuideDetailsPage() {
             <div className="flex items-center gap-3">
               <div className="flex -space-x-3 shrink-0">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden relative shadow-sm">
-                    <Image src={`https://i.pravatar.cc/100?u=${i + 40}`} fill alt="user" />
+                  <div
+                    key={i}
+                    className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden relative shadow-sm"
+                  >
+                    <Image
+                      src={`https://i.pravatar.cc/100?u=${i + 40}`}
+                      fill
+                      alt="user"
+                    />
                   </div>
                 ))}
               </div>
               <p className="text-[10px] font-black text-slate-900 uppercase italic tracking-tighter leading-none">
-                Déjà <span className="text-blue-600 underline">{salesCount} voyageurs</span> ont payé le guide
+                Déjà{" "}
+                <span className="text-blue-600 underline">
+                  {salesCount} voyageurs
+                </span>{" "}
+                ont payé le guide
               </p>
             </div>
             <div className="flex items-center gap-2 bg-red-50 px-3 py-1.5 rounded-full border border-red-100">
@@ -288,7 +334,9 @@ export default function GuideDetailsPage() {
           <div className="relative w-full h-3 bg-slate-200 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
-              whileInView={{ width: `${(salesCount / (guide.sales_target || 500)) * 100}%` }}
+              whileInView={{
+                width: `${(salesCount / (guide.sales_target || 500)) * 100}%`,
+              }}
               transition={{ duration: 2 }}
               className="absolute h-full bg-blue-600 rounded-full"
             />
@@ -299,7 +347,6 @@ export default function GuideDetailsPage() {
       {/* 4. MAIN CONTENT GRID (STICKY LOGIC HERE) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 md:gap-16 items-start">
         <div className="lg:col-span-2 space-y-16">
-          
           {/* SECTION : POURQUOI ? */}
           <section className="space-y-6">
             <h3 className="text-2xl font-black text-slate-900 italic uppercase flex items-center gap-3">
@@ -321,10 +368,12 @@ export default function GuideDetailsPage() {
 
             <div className="space-y-2">
               <h3 className="text-2xl md:text-3xl font-black text-slate-900 italic uppercase tracking-tighter">
-                Sommaire du <span className="text-blue-600">Plan d&apos;Action</span>
+                Sommaire du{" "}
+                <span className="text-blue-600">Plan d&apos;Action</span>
               </h3>
               <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">
-                {guide.content_list?.length || 0} étapes clés pour réussir votre procédure solo
+                {guide.content_list?.length || 0} étapes clés pour réussir votre
+                procédure solo
               </p>
             </div>
 
@@ -354,14 +403,29 @@ export default function GuideDetailsPage() {
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {[
-                        { icon: FileText, text: "Modèle de document Word", type: "Template" },
-                        { icon: Globe, text: "Lien portail gouvernemental", type: "Officiel" },
+                        {
+                          icon: FileText,
+                          text: "Modèle de document Word",
+                          type: "Template",
+                        },
+                        {
+                          icon: Globe,
+                          text: "Lien portail gouvernemental",
+                          type: "Officiel",
+                        },
                       ].map((res, i) => (
-                        <div key={i} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100">
+                        <div
+                          key={i}
+                          className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100"
+                        >
                           <res.icon className="w-4 h-4 text-blue-600" />
                           <div className="flex flex-col leading-tight">
-                            <span className="text-[10px] font-black text-slate-900 uppercase leading-none">{res.text}</span>
-                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{res.type}</span>
+                            <span className="text-[10px] font-black text-slate-900 uppercase leading-none">
+                              {res.text}
+                            </span>
+                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">
+                              {res.type}
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -382,11 +446,17 @@ export default function GuideDetailsPage() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {testimonials.map((t, i) => (
-                <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-4 relative overflow-hidden group">
+                <div
+                  key={i}
+                  className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-4 relative overflow-hidden group"
+                >
                   <Quote className="absolute -top-2 -right-2 w-16 h-16 text-slate-50 group-hover:text-blue-50 transition-colors" />
                   <div className="flex gap-1 relative z-10">
                     {[...Array(t.rating)].map((_, idx) => (
-                      <Star key={idx} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                      <Star
+                        key={idx}
+                        className="w-3 h-3 fill-yellow-400 text-yellow-400"
+                      />
                     ))}
                   </div>
                   <p className="text-sm italic text-slate-600 font-medium leading-relaxed relative z-10">
@@ -397,8 +467,12 @@ export default function GuideDetailsPage() {
                       {t.initial}
                     </div>
                     <div>
-                      <p className="text-xs font-black text-slate-900 uppercase tracking-tighter">{t.name}</p>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{t.city}</p>
+                      <p className="text-xs font-black text-slate-900 uppercase tracking-tighter">
+                        {t.name}
+                      </p>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                        {t.city}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -415,25 +489,54 @@ export default function GuideDetailsPage() {
                 </div>
                 <h3 className="text-3xl md:text-5xl font-black tracking-tighter leading-none italic uppercase">
                   L&apos;Arsenal <br />{" "}
-                  <span className="text-blue-500 underline decoration-blue-500/30">VIP WhatsApp</span>
+                  <span className="text-blue-500 underline decoration-blue-500/30">
+                    VIP WhatsApp
+                  </span>
                 </h3>
                 <p className="text-slate-400 text-sm font-medium leading-relaxed">
-                  Notre communauté WhatsApp vous accompagne dans chaque document, chaque rendez-vous. Ne restez plus jamais seul face à l&apos;administration.
+                  Notre communauté WhatsApp vous accompagne dans chaque
+                  document, chaque rendez-vous. Ne restez plus jamais seul face
+                  à l&apos;administration.
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-5">
                 {[
-                  { icon: MessageSquare, color: "bg-green-600", title: "Groupe WhatsApp", desc: "Échangez avec les autres et nos experts." },
-                  { icon: FileText, color: "bg-blue-600", title: "Modèles de Lettres", desc: "Format Word prêt à l'emploi." },
-                  { icon: ShieldCheck, color: "bg-blue-600", title: "Checklist Anti-Refus", desc: "100% conforme aux exigences 2026." },
+                  {
+                    icon: MessageSquare,
+                    color: "bg-green-600",
+                    title: "Groupe WhatsApp",
+                    desc: "Échangez avec les autres et nos experts.",
+                  },
+                  {
+                    icon: FileText,
+                    color: "bg-blue-600",
+                    title: "Modèles de Lettres",
+                    desc: "Format Word prêt à l'emploi.",
+                  },
+                  {
+                    icon: ShieldCheck,
+                    color: "bg-blue-600",
+                    title: "Checklist Anti-Refus",
+                    desc: "100% conforme aux exigences 2026.",
+                  },
                 ].map((bonus, i) => (
-                  <motion.div whileHover={{ x: 10 }} key={i} className="flex items-center gap-5 p-5 bg-white/5 rounded-3xl border border-white/10">
-                    <div className={`w-14 h-14 ${bonus.color} rounded-2xl flex items-center justify-center shrink-0 shadow-xl`}>
+                  <motion.div
+                    whileHover={{ x: 10 }}
+                    key={i}
+                    className="flex items-center gap-5 p-5 bg-white/5 rounded-3xl border border-white/10"
+                  >
+                    <div
+                      className={`w-14 h-14 ${bonus.color} rounded-2xl flex items-center justify-center shrink-0 shadow-xl`}
+                    >
                       <bonus.icon className="w-7 h-7 text-white" />
                     </div>
                     <div>
-                      <p className="font-black text-sm uppercase tracking-tighter">{bonus.title}</p>
-                      <p className="text-[11px] text-slate-400 font-medium mt-1">{bonus.desc}</p>
+                      <p className="font-black text-sm uppercase tracking-tighter">
+                        {bonus.title}
+                      </p>
+                      <p className="text-[11px] text-slate-400 font-medium mt-1">
+                        {bonus.desc}
+                      </p>
                     </div>
                   </motion.div>
                 ))}
@@ -457,9 +560,18 @@ export default function GuideDetailsPage() {
         <ScrollArea className="w-full">
           <div className="flex space-x-8 pb-10">
             {relatedGuides.map((g) => (
-              <Link href={`/guides/${g.slug}`} key={g.id} className="w-80 shrink-0 group">
+              <Link
+                href={`/guides/${g.slug}`}
+                key={g.id}
+                className="w-80 shrink-0 group"
+              >
                 <div className="relative h-48 w-full rounded-[2.5rem] overflow-hidden mb-4 shadow-md bg-slate-100">
-                  <Image src={g.image_url} fill className="object-cover group-hover:scale-110 transition-transform duration-700" alt={g.title} />
+                  <Image
+                    src={g.image_url}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    alt={g.title}
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent" />
                   <div className="absolute bottom-6 left-6 right-6">
                     <p className="text-white font-black italic uppercase text-sm line-clamp-1 tracking-tighter leading-none">
@@ -467,7 +579,9 @@ export default function GuideDetailsPage() {
                     </p>
                   </div>
                 </div>
-                <p className="text-blue-600 font-black italic text-lg">{g.price?.toLocaleString()} FCFA</p>
+                <p className="text-blue-600 font-black italic text-lg">
+                  {g.price?.toLocaleString()} FCFA
+                </p>
               </Link>
             ))}
           </div>
@@ -496,7 +610,7 @@ export default function GuideDetailsPage() {
               asChild
               className="flex-1 h-14 bg-blue-600 text-white font-black rounded-xl text-xs uppercase italic tracking-tighter shadow-lg shadow-blue-200 active:scale-95 transition-all"
             >
-              <Link href={`/checkout/${guide.chariow_id}`}>
+              <Link href={`/guides/${guide.chariow_id}/checkout`}>
                 OBTENIR <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
@@ -505,7 +619,14 @@ export default function GuideDetailsPage() {
       </AnimatePresence>
 
       <style jsx global>{`
-        @keyframes shimmer { 0% { background-position: 0 0; } 100% { background-position: 60px 0; } }
+        @keyframes shimmer {
+          0% {
+            background-position: 0 0;
+          }
+          100% {
+            background-position: 60px 0;
+          }
+        }
       `}</style>
     </div>
   );

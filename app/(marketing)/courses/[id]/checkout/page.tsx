@@ -41,6 +41,7 @@ export default function CheckoutPage() {
       full_name: formData.name,
       phone: phoneValue, // Envoi du numéro formaté internationalement
       promo_code: formData.promoCode,
+      product_type: "course"
     });
 
     if (result.url) {
