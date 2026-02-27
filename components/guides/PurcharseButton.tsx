@@ -32,7 +32,7 @@ export default function PurchaseButton({ productId, email }: { productId: string
     <Button 
       onClick={handlePurchase}
       disabled={loading}
-      className="w-full h-20 bg-blue-600 hover:bg-blue-700 text-white rounded-[1.5rem] font-black italic uppercase text-lg shadow-xl shadow-blue-200 transition-all active:scale-95"
+      className="w-full h-20 bg-blue-600 hover:bg-blue-700 text-white rounded-3xl font-black italic uppercase text-lg shadow-xl shadow-blue-200 transition-all active:scale-95"
     >
       {loading ? <Loader2 className="animate-spin" /> : (
         <span className="flex items-center gap-2">ACHETER MAINTENANT <ShoppingCart className="w-5 h-5" /></span>

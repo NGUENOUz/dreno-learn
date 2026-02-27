@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, AlertCircle, X, ArrowRight } from "lucide-react";
+import { ShoppingCart, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/useCartStore";
 
@@ -42,7 +42,7 @@ export function ExitIntentPopup() {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-99999 flex items-center justify-center px-4">
           {/* Overlay sombre en fond */}
           <motion.div
             initial={{ opacity: 0 }}

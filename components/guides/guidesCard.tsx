@@ -77,7 +77,7 @@ export default function GuideCard({ guide }: GuideCardProps) {
             className="object-cover group-hover:scale-110 transition-transform duration-700"
             unoptimized
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
           
           {/* Badge Catégorie */}
           <div className="absolute top-4 left-4 flex gap-2">
