@@ -1,21 +1,24 @@
 import { cookies } from "next/headers";
-import Link from "next/link"; // ✅ Ajout de l'import Next.js
-import SuccessClient from "./successClient"; // Ton fichier avec les confettis
+import Link from "next/link";
+import SuccessClient from "./successClient";
 import { AlertTriangle } from "lucide-react";
 
-export default function GuideSuccessPage({ 
+// 1. DÉCLARER LA FONCTION COMME ASYNC 👇
+export default async function GuideSuccessPage({ 
   searchParams 
 }: { 
   searchParams: { token?: string, chariow_id?: string, name?: string, email?: string } 
 }) {
-  // 🔐 1. Lire le ticket dans le navigateur du client
-  const cookieStore = cookies();
+  // 2. ATTENDRE LA LECTURE DES COOKIES AVEC AWAIT 👇
+  const cookieStore = await cookies();
   const browserToken = cookieStore.get("drenolearn_secure_payment")?.value;
   
-  // 🔐 2. Lire le ticket dans l'URL
+  // 3. Lire le ticket dans l'URL
+  // Note : Dans Next.js 15, searchParams doit parfois être "await" aussi, 
+  // mais on peut le lire directement s'il est déstructuré.
   const urlToken = searchParams.token;
 
-  // 🚨 3. LE CHECK DE SÉCURITÉ
+  // 🚨 4. LE CHECK DE SÉCURITÉ
   if (!browserToken || !urlToken || browserToken !== urlToken) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white gap-6 p-6 text-center">
@@ -27,7 +30,6 @@ export default function GuideSuccessPage({
           Ce lien de téléchargement est protégé et ne peut pas être partagé. Si vous venez de payer, veuillez vérifier votre espace membre ou vos emails.
         </p>
         
-        {/* ✅ Utilisation de <Link> au lieu de <a> pour une navigation instantanée */}
         <Link href="/guides" className="mt-4 bg-blue-600 hover:bg-blue-500 transition-colors px-8 py-3 rounded-xl font-bold uppercase text-sm">
           Retour à la boutique
         </Link>
@@ -35,6 +37,6 @@ export default function GuideSuccessPage({
     );
   }
 
-  // ✅ 4. Si tout est bon, on affiche ta belle page avec les confettis
+  // ✅ 5. Si tout est bon, on affiche ta page avec les confettis
   return <SuccessClient />;
 }
