@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import { 
@@ -12,6 +12,40 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti"; // 🎉 L'outil magique
 
+
+
+ const triggerConfetti = () => {
+    const duration = 3 * 1000; // Dure 3 secondes
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+    const interval: any = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+      // Couleurs : Bleu Dreno, Vert Succès, Jaune Étoile
+      const colors = ['#2563EB', '#22C55E', '#EAB308']; 
+
+      // Tir depuis la gauche
+      confetti(Object.assign({}, defaults, { 
+        particleCount, 
+        colors,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+      }));
+      // Tir depuis la droite
+      confetti(Object.assign({}, defaults, { 
+        particleCount, 
+        colors,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+      }));
+    }, 250);
+  };
 export default function SuccessClient() {
   const searchParams = useSearchParams();
   const chariowId = searchParams.get("chariow_id"); 
@@ -46,38 +80,7 @@ export default function SuccessClient() {
   }, [chariowId, supabase]);
 
   // 🎇 FONCTION D'ANIMATION : Effet "Feu d'artifice" aux couleurs de DrenoLearn
-  const triggerConfetti = () => {
-    const duration = 3 * 1000; // Dure 3 secondes
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
-
-    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-    const interval: any = setInterval(function() {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      }
-
-      const particleCount = 50 * (timeLeft / duration);
-      // Couleurs : Bleu Dreno, Vert Succès, Jaune Étoile
-      const colors = ['#2563EB', '#22C55E', '#EAB308']; 
-
-      // Tir depuis la gauche
-      confetti(Object.assign({}, defaults, { 
-        particleCount, 
-        colors,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
-      }));
-      // Tir depuis la droite
-      confetti(Object.assign({}, defaults, { 
-        particleCount, 
-        colors,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
-      }));
-    }, 250);
-  };
+ 
 
   if (loading) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
@@ -89,7 +92,7 @@ export default function SuccessClient() {
   if (!guide) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
       <h1 className="text-2xl font-black text-red-500 uppercase">Accès introuvable</h1>
-      <p className="text-slate-500">Un problème est survenu avec l'identifiant de la commande.</p>
+      <p className="text-slate-500">Un problème est survenu avec l&apos;identifiant de la commande.</p>
       <Button asChild variant="outline"><Link href="/guides">Retour à la boutique</Link></Button>
     </div>
   );
@@ -120,7 +123,7 @@ export default function SuccessClient() {
             {/* BOUTON PDF */}
             <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex flex-col space-y-6 hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg"><Download className="w-6 h-6 text-white" /></div>
-              <div className="flex-grow">
+              <div className="grow">
                 <h3 className="font-black text-sm uppercase tracking-tighter">Guide PDF & Modèles</h3>
                 <p className="text-slate-400 text-xs mt-1">Téléchargez vos documents sur Google Drive.</p>
               </div>
@@ -132,7 +135,7 @@ export default function SuccessClient() {
             {/* BOUTON WHATSAPP */}
             <div className="bg-green-50/50 p-6 rounded-3xl border border-green-100 flex flex-col space-y-6 hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg"><MessageSquare className="w-6 h-6 text-white" /></div>
-              <div className="flex-grow">
+              <div className="grow">
                 <h3 className="font-black text-sm uppercase tracking-tighter text-green-900">Groupe WhatsApp VIP</h3>
                 <p className="text-green-700/70 text-xs mt-1">Rejoignez la communauté pour vos questions.</p>
               </div>
