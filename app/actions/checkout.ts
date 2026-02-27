@@ -1,11 +1,9 @@
 "use server";
 
 import { parsePhoneNumber, CountryCode } from 'libphonenumber-js';
+import { cookies } from "next/headers"; // 🔐 Ajout de l'import des cookies
+import { crypto } from "crypto";
 
-/**
- * ACTION DE CHECKOUT SÉCURISÉE
- * Gère l'initiation du paiement via Chariow et configure les redirections de succès.
- */
 export async function initiateChariowCheckout(formData: {
   product_id: string; // ID Chariow (ex: nouveau-guide-2026)
   email: string;
@@ -48,13 +46,25 @@ export async function initiateChariowCheckout(formData: {
   // Assurez-vous d'avoir renommé votre dossier "success" en "guide-success"
   const successPath = formData.product_type === "guides" ? "/guide-success" : "/course-success";
 
+
+  const securityToken = crypto.randomUUID(); // Génère un ID unique comme "a1b2-c3d4..."
+  
+  // 🔐 2. CACHER LE SCEAU DANS LE NAVIGATEUR (Valable 1 heure max)
+  cookies().set("drenolearn_secure_payment", securityToken, {
+    httpOnly: true, // Impossible à voler via Javascript
+    secure: process.env.NODE_ENV === "production", // Sécurisé en HTTPS
+    maxAge: 60 * 60, // Expire dans 1 heure
+    path: "/",
+  });
+
   // IMPORTANT : On s'assure de passer chariow_id
   const successParams = new URLSearchParams({
     email: cleanEmail,
     name: cleanFullName,
     phone: formData.phone,
     chariow_id: cleanProductId, // C'est ici qu'on injecte l'ID exact
-    type: formData.product_type
+    type: formData.product_type,
+    token: securityToken
   }).toString();
 
   const finalRedirectUrl = `${baseUrl}${successPath}?${successParams}`;
