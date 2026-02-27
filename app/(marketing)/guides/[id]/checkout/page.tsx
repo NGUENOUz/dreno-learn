@@ -87,7 +87,7 @@ export default function GuideCheckoutPage() {
 
   return (
     <div className="min-h-screen bg-white md:bg-slate-50 flex items-center justify-center p-0 md:p-6 font-sans">
-      <div className="w-full max-w-5xl bg-white md:rounded-[3rem] md:shadow-2xl md:shadow-blue-900/10 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+      <div className="w-full max-w-5xl bg-white md:rounded-[3rem] md:shadow-2xl md:shadow-blue-900/10 overflow-hidden flex flex-col md:flex-row min-h-150">
         
         {/* --- SECTION RÉCAPITULATIF (GAUCHE) --- */}
         <div className="hidden md:flex w-full md:w-[40%] bg-slate-900 text-white p-12 flex-col justify-between relative">

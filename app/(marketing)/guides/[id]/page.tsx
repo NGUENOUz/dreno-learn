@@ -4,12 +4,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   Star,
-  Clock,
   FileText,
   ArrowRight,
   ShieldCheck,
   MessageSquare,
-  ChevronRight,
   Download,
   Globe,
   Zap,
@@ -216,7 +214,7 @@ export default function GuideDetailsPage() {
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             exit={{ y: -100 }}
-            className="hidden lg:flex fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-b border-slate-100 p-4 z-[100] shadow-xl"
+            className="hidden lg:flex fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-b border-slate-100 p-4 z-100 shadow-xl"
           >
             <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-6">
               <div className="flex items-center gap-4">
@@ -254,7 +252,7 @@ export default function GuideDetailsPage() {
           alt={guide.title}
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-900/40 to-transparent" />
         <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16 space-y-6">
           <div className="flex flex-wrap gap-3">
             <span className="px-5 py-1.5 bg-blue-600 text-white text-[10px] font-black uppercase rounded-full shadow-lg tracking-widest">
@@ -572,7 +570,7 @@ export default function GuideDetailsPage() {
                     className="object-cover group-hover:scale-110 transition-transform duration-700"
                     alt={g.title}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 to-transparent" />
                   <div className="absolute bottom-6 left-6 right-6">
                     <p className="text-white font-black italic uppercase text-sm line-clamp-1 tracking-tighter leading-none">
                       {g.title}
@@ -596,7 +594,7 @@ export default function GuideDetailsPage() {
             initial={{ y: 100 }}
             animate={{ y: 0 }}
             exit={{ y: 100 }}
-            className="lg:hidden fixed bottom-6 left-4 right-4 bg-white/95 backdrop-blur-xl border border-slate-100 p-4 z-[110] flex items-center justify-between gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-[2rem]"
+            className="lg:hidden fixed bottom-6 left-4 right-4 bg-white/95 backdrop-blur-xl border border-slate-100 p-4 z-110 flex items-center justify-between gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-4xl"
           >
             <div className="shrink-0 pl-2">
               <p className="text-[8px] font-black text-green-600 uppercase italic tracking-widest leading-none mb-1">

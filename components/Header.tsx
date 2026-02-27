@@ -52,7 +52,7 @@ export function Header() {
   return (
     <>
       {/* 1. HEADER NORMAL (Celui de la page) */}
-      <header className="sticky top-0 z-[990] w-full bg-white/90 backdrop-blur-md border-b border-slate-100">
+      <header className="sticky top-0 z-990 w-full bg-white/90 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
           
           {/* LOGO */}
@@ -75,7 +75,7 @@ export function Header() {
               >
                 {link.name}
                 {link.isNew && (
-                  <span className="bg-yellow-400 text-[#0F172A] text-[8px] px-2 py-0.5 rounded-full text-black">NOUVEAU</span>
+                  <span className="bg-yellow-400 text-[8px] px-2 py-0.5 rounded-full text-black">NOUVEAU</span>
                 )}
               </Link>
             ))}
@@ -92,7 +92,7 @@ export function Header() {
                 </span>
               )}
             </Link>
-            <div className="h-6 w-[1px] bg-slate-200 mx-2" />
+            <div className="h-6 w-px bg-slate-200 mx-2" />
             <Button asChild variant="ghost" className="font-black uppercase text-xs tracking-widest text-slate-500 hover:text-blue-600">
               <Link href="/login">Connexion</Link>
             </Button>
@@ -130,7 +130,7 @@ export function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: "100%" }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 w-full h-[100dvh] bg-white z-[9999] flex flex-col overflow-hidden"
+            className="fixed inset-0 w-full h-dvh bg-white z-999 flex flex-col overflow-hidden"
           >
             {/* Header interne au menu mobile (avec le bouton X) */}
             <div className="flex items-center justify-between px-4 h-20 border-b border-slate-100 bg-white shrink-0">
@@ -177,7 +177,7 @@ export function Header() {
                   );
                 })}
 
-                <div className="my-4 h-[1px] bg-slate-100" />
+                <div className="my-4 h-px bg-slate-100" />
 
                 <Link 
                   href="/cart"
