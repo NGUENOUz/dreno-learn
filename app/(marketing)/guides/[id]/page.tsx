@@ -185,7 +185,7 @@ export default function GuideDetailsPage() {
   }, [id, supabase]);
 
   useEffect(() => {
-    const handleScroll = () => setShowStickyCTA(window.scrollY > 700);
+    const handleScroll = () => setShowStickyCTA(window.scrollY > 100);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -608,7 +608,7 @@ export default function GuideDetailsPage() {
             </div>
             <Button
               asChild
-              className="flex-1 h-14 bg-blue-600 text-white font-black rounded-xl text-xs uppercase italic tracking-tighter shadow-lg shadow-blue-200 active:scale-95 transition-all"
+              className="flex-1 h-14 bg-blue-600 text-white font-black rounded-xl text-xs uppercase italic tracking-tighter shadow-lg shadow-blue-200 active:scale-95 transition-ease-all leftRight"
             >
               <Link href={`/guides/${guide.chariow_id}/checkout`}>
                 OBTENIR <ArrowRight className="w-4 h-4 ml-2" />

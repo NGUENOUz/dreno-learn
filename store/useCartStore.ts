@@ -1,39 +1,42 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// 1. Définition de l'interface Course pour remplacer "any"
-export interface Course {
-  id: string;
+export type CartItem = {
+  id: string; // UUID interne
+  chariow_id: string;
   title: string;
   price: number;
   image_url: string;
-  category?: string;
-}
+  type: "courses" | "guides"; // Pour savoir vers quel checkout le rediriger
+};
 
-// 2. Interface du Store avec des types stricts
 export interface CartState {
-  items: Course[]; 
-  addToCart: (course: Course) => void;
-  removeFromCart: (id: string) => void;
+  items: CartItem[];
+  addItem: (item: CartItem) => void;
+  removeItem: (chariow_id: string) => void;
   clearCart: () => void;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
-      items: [], // Initialisé à 0 par défaut
-      
-      addToCart: (course: Course) => set((state) => ({ 
-        // On vérifie si le cours est déjà présent pour éviter les doublons
-        items: state.items.find(i => i.id === course.id) ? state.items : [...state.items, course] 
-      })),
-      
-      removeFromCart: (id: string) => set((state) => ({ 
-        items: state.items.filter(i => i.id !== id) 
-      })),
-      
+      items: [],
+      addItem: (item) =>
+        set((state) => {
+          // Éviter les doublons dans le panier
+          if (state.items.find((i) => i.chariow_id === item.chariow_id)) {
+            return state;
+          }
+          return { items: [...state.items, item] };
+        }),
+      removeItem: (chariow_id) =>
+        set((state) => ({
+          items: state.items.filter((i) => i.chariow_id !== chariow_id),
+        })),
       clearCart: () => set({ items: [] }),
     }),
-    { name: 'drenolearn-cart' }
+    {
+      name: 'drenolearn-cart', // Nom dans le localStorage
+    }
   )
 );

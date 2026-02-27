@@ -1,5 +1,6 @@
 // app/(marketing)/layout.tsx
 import { Header } from "@/components/Header";
+import { ExitIntentPopup } from "@/components/ui/exitIntentPopup";
 
 
 export default function MarketingLayout({
@@ -10,6 +11,7 @@ export default function MarketingLayout({
       <Header />
       <main className="grow flex flex-col">
         {children}
+        <ExitIntentPopup />
       </main>
       
     </>

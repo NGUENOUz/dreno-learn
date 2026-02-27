@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { 
   ShieldCheck, Lock, ShoppingBag, Loader2, 
-  ArrowRight, ChevronLeft, TicketPercent, MessageSquare 
+  ArrowRight, ChevronLeft, TicketPercent, MessageSquare, Check 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { initiateChariowCheckout } from "@/app/actions/checkout";
@@ -129,7 +129,51 @@ export default function GuideCheckoutPage() {
 
         {/* --- SECTION FORMULAIRE (DROITE) --- */}
         <div className="flex-1 p-6 md:p-16 bg-white flex flex-col justify-center">
-          <div className="max-w-md mx-auto w-full space-y-8">
+          <div className="max-w-md mx-auto w-full space-y-10"> {/* Remplacé space-y-8 par space-y-10 pour l'espace */}
+            
+            {/* ✨ NOUVEAU : INDICATEUR D'ÉTAPES (STEPPER) */}
+            <div className="relative w-full mb-6">
+              {/* Ligne de fond grise */}
+              <div className="absolute top-4 left-0 w-full h-1 bg-slate-100 rounded-full z-0" />
+              
+              {/* Ligne de progression dynamique (se remplit quand ça charge) */}
+              <div 
+                className={`absolute top-4 left-0 h-1 bg-blue-600 rounded-full z-0 transition-all duration-500 ${loading ? 'w-[50%]' : 'w-[0%]'}`} 
+              />
+
+              <div className="relative z-10 flex justify-between">
+                {/* Étape 1 : Informations */}
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-200 transition-all">
+                    {loading ? <Check className="w-4 h-4" /> : <span className="text-xs font-black">1</span>}
+                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-blue-600 text-center">
+                    Infos
+                  </span>
+                </div>
+
+                {/* Étape 2 : Paiement Mobile */}
+                <div className="flex flex-col items-center gap-2">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${loading ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200 scale-110' : 'bg-white border-slate-200 text-slate-300'}`}>
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <span className="text-xs font-black">2</span>}
+                  </div>
+                  <span className={`text-[9px] font-black uppercase tracking-widest text-center transition-colors duration-500 ${loading ? 'text-blue-600' : 'text-slate-400'}`}>
+                    Paiement Mobile
+                  </span>
+                </div>
+
+                {/* Étape 3 : Accès */}
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-white border-2 border-slate-200 text-slate-300 flex items-center justify-center transition-all">
+                    <span className="text-xs font-black">3</span>
+                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-center">
+                    Vos Accès
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <div className="hidden md:block space-y-2">
               <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Réception du Guide</h2>
               <p className="text-xs text-slate-400 font-medium">Vos accès seront envoyés à ces coordonnées.</p>
@@ -150,7 +194,7 @@ export default function GuideCheckoutPage() {
 
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase text-blue-600 tracking-widest ml-1 flex items-center gap-2">
-                    <MessageSquare className="w-3 h-3" /> Numéro WhatsApp
+                    <MessageSquare className="w-3 h-3" /> Numéro WhatsApp (pour rejoindre le groupe VIP)
                   </label>
                   <div className="phone-elite-container">
                     <PhoneInput
