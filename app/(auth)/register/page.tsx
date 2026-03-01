@@ -16,8 +16,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { registerSchema, AuthService } from "@/services/auth.service";
-import { useUserStore } from "@/store/useUserStore";
+// ✅ ON CHANGE L'IMPORT ICI : On utilise l'action serveur, plus le service client
+import { finalizeSignUpAction } from "@/app/actions/auth";
+import { z } from "zod"; // On définit le schéma ici directement pour simplifier
+
+// Schéma de validation
+const registerSchema = z.object({
+  fullName: z.string().min(2, "Nom trop court"),
+  email: z.string().email("Email invalide"),
+  phone: z.string().min(9, "Numéro invalide"),
+  password: z.string().min(6, "Minimum 6 caractères"),
+});
 
 function RegisterContent() {
   const searchParams = useSearchParams();
@@ -27,7 +36,6 @@ function RegisterContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
-  const setUserData = useUserStore((state) => state.setUserData);
 
   const { register, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
     resolver: zodResolver(registerSchema),
@@ -39,7 +47,6 @@ function RegisterContent() {
     }
   });
 
-  // Si les paramètres URL changent (ou mettent du temps à charger), on force la mise à jour des champs
   useEffect(() => {
     if (defaultName) setValue("fullName", defaultName);
     if (defaultEmail) setValue("email", defaultEmail);
@@ -49,21 +56,24 @@ function RegisterContent() {
     setIsLoading(true);
     setServerError(null);
     try {
-      const authData = await AuthService.register(values);
+      // ✅ APPEL À L'ACTION SERVEUR (Plus robuste que AuthService)
+      const result = await finalizeSignUpAction({
+        email: values.email,
+        password: values.password,
+        full_name: values.fullName,
+        phone: values.phone
+      });
       
-      if (authData.user) {
-        setUserData({
-          name: values.fullName,
-          email: values.email,
-          phone: values.phone,
-          id: authData.user.id
-        });
+      if (result.success) {
         setIsSuccess(true);
         toast.success("Compte créé ! Vérifiez vos emails.");
+      } else {
+        setServerError(result.error || "Une erreur est survenue");
+        toast.error(result.error || "Erreur d'inscription");
       }
     } catch (error: any) {
-      setServerError(error.message || "Erreur lors de l'inscription");
-      toast.error("Une erreur est survenue.");
+      setServerError("Erreur de connexion au serveur");
+      toast.error("Erreur critique.");
     } finally {
       setIsLoading(false);
     }
@@ -71,8 +81,8 @@ function RegisterContent() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-pattern-afro px-4">
-        <Card className="w-full max-w-125 border-none shadow-2xl rounded-[2.5rem] bg-white p-8 text-center space-y-6">
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-slate-50 px-4">
+        <Card className="w-full max-w-lg border-none shadow-2xl rounded-[2.5rem] bg-white p-8 text-center space-y-6">
           <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto text-blue-600">
             <MailCheck className="w-10 h-10" />
           </div>
@@ -84,7 +94,7 @@ function RegisterContent() {
             </CardDescription>
           </div>
           <p className="text-sm text-slate-400">
-            Vous devez cliquer sur le lien dans l'email pour activer votre accès aux formations de <strong>DrenoLearn</strong>.
+            Cliquez sur le lien dans l'email pour activer votre accès aux formations.
           </p>
           <div className="pt-4">
             <Button asChild className="w-full h-12 bg-slate-900 rounded-xl font-bold">
@@ -97,28 +107,25 @@ function RegisterContent() {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-pattern-afro px-4 py-12 relative">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-slate-50 px-4 py-12 relative">
       <Link href="/" className="absolute top-6 left-6 flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-blue-600 transition-all bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-slate-100">
         <ChevronLeft className="w-4 h-4" /> Retour
       </Link>
 
-      <Card className="w-full max-w-125 border-none shadow-2xl rounded-[2.5rem] bg-white/95 backdrop-blur-md overflow-hidden">
+      <Card className="w-full max-w-lg border-none shadow-2xl rounded-[2.5rem] bg-white/95 backdrop-blur-md overflow-hidden">
         <div className="h-2 bg-blue-600 w-full" />
         <CardHeader className="space-y-2 pb-8 pt-10 text-center relative">
-          
-          {/* Badge informatif si l'utilisateur vient d'un achat */}
           {defaultEmail && (
             <div className="absolute top-4 right-4 bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[9px] font-black uppercase flex items-center gap-1">
               <Sparkles className="w-3 h-3" /> Sécurisation d'achat
             </div>
           )}
-
           <CardTitle className="text-3xl font-black text-slate-900 tracking-tight italic">Rejoignez l'élite</CardTitle>
           <CardDescription className="text-slate-500 font-medium italic">
             Créez votre compte pour accéder à vie à vos formations.
           </CardDescription>
           {serverError && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-xs font-bold animate-shake">
+            <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-xs font-bold animate-pulse">
               {serverError}
             </div>
           )}
@@ -126,6 +133,7 @@ function RegisterContent() {
         
         <CardContent className="space-y-5">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* ... LES CHAMPS RESTENT IDENTIQUES ... */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-[11px] font-black uppercase text-slate-400 ml-1 tracking-widest">Nom Complet</Label>
@@ -180,7 +188,6 @@ function RegisterContent() {
   );
 }
 
-// WRAPPER OBLIGATOIRE POUR NEXT.JS
 export default function RegisterPage() {
   return <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50"><Loader2 className="animate-spin text-blue-600 w-10 h-10"/></div>}><RegisterContent /></Suspense>;
 }

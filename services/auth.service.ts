@@ -1,12 +1,16 @@
 import { z } from "zod";
-import { supabase } from "@/lib/supabase";
+import { createBrowserClient } from "@supabase/ssr";
+
+// ⚠️ IMPORTANT : On s'assure d'utiliser le bon client browser
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 /**
  * ==========================================
  * 1. SCHÉMAS DE VALIDATION (ZOD)
  * ==========================================
- * Ces schémas garantissent que les données sont propres 
- * avant même de toucher la base de données.
  */
 
 export const loginSchema = z.object({
@@ -14,6 +18,8 @@ export const loginSchema = z.object({
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
 });
 
+// On garde le schema pour l'utiliser ailleurs si besoin, 
+// même si la page register a maintenant sa propre validation.
 export const registerSchema = z.object({
   fullName: z.string().min(3, "Le nom doit contenir au moins 3 caractères"),
   email: z.string().email("Format d'email invalide"),
@@ -21,19 +27,18 @@ export const registerSchema = z.object({
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
 });
 
-// Définition des types basés sur les schémas
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 
 /**
  * ==========================================
- * 2. AUTH SERVICE
+ * 2. AUTH SERVICE (NETTOYÉ)
  * ==========================================
  */
 
 export const AuthService = {
   /**
-   * Connecte un utilisateur existant
+   * Connecte un utilisateur existant (Reste côté client, c'est OK)
    */
   async login(data: LoginInput) {
     const { data: authData, error } = await supabase.auth.signInWithPassword({
@@ -42,64 +47,34 @@ export const AuthService = {
     });
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error("Email ou mot de passe incorrect.");
     }
 
     return authData;
   },
 
   /**
-   * Crée un nouveau compte utilisateur
-   * Les métadonnées (full_name, phone) seront récupérées par le trigger SQL 
-   * 'handle_new_user' pour remplir ta table 'profiles'.
+   * ❌ L'ANCIENNE FONCTION REGISTER A ÉTÉ SUPPRIMÉE
+   * On utilise maintenant 'finalizeSignUpAction' dans 'app/actions/auth.ts'
+   * pour garantir la synchronisation avec la base de données.
    */
-  async register(data: RegisterInput) {
-    const { data: authData, error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {
-          full_name: data.fullName,
-          phone: data.phone,
-        },
-      },
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return authData;
-  },
 
   /**
-   * Déconnecte l'utilisateur et nettoie la session
+   * Déconnecte l'utilisateur
    */
   async logout() {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+    // On force le rafraîchissement de la page pour nettoyer les états
+    window.location.href = "/"; 
   },
 
   /**
-   * Récupère la session actuelle (utile pour le Dashboard)
+   * Récupère la session actuelle
    */
   async getCurrentUser() {
     const { data: { session }, error } = await supabase.auth.getSession();
     if (error || !session) return null;
     return session.user;
   },
-
-  /**
-   * Récupère le profil complet de l'utilisateur depuis la table 'profiles'
-   */
-  async getUserProfile(userId: string) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (error) throw error;
-    return data;
-  }
 };
