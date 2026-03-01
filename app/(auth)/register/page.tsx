@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { 
   ChevronLeft, Loader2, Lock, Mail, Phone, 
-  User, CheckCircle2, MailCheck, Sparkles 
+  User, MailCheck, Sparkles 
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -72,7 +72,7 @@ function RegisterContent() {
   if (isSuccess) {
     return (
       <div className="min-h-screen w-full flex flex-col items-center justify-center bg-pattern-afro px-4">
-        <Card className="w-full max-w-[500px] border-none shadow-2xl rounded-[2.5rem] bg-white p-8 text-center space-y-6">
+        <Card className="w-full max-w-125 border-none shadow-2xl rounded-[2.5rem] bg-white p-8 text-center space-y-6">
           <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto text-blue-600">
             <MailCheck className="w-10 h-10" />
           </div>
@@ -102,7 +102,7 @@ function RegisterContent() {
         <ChevronLeft className="w-4 h-4" /> Retour
       </Link>
 
-      <Card className="w-full max-w-[500px] border-none shadow-2xl rounded-[2.5rem] bg-white/95 backdrop-blur-md overflow-hidden">
+      <Card className="w-full max-w-125 border-none shadow-2xl rounded-[2.5rem] bg-white/95 backdrop-blur-md overflow-hidden">
         <div className="h-2 bg-blue-600 w-full" />
         <CardHeader className="space-y-2 pb-8 pt-10 text-center relative">
           

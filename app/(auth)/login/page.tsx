@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+
 import { useState, Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -75,7 +75,7 @@ function LoginContent() {
         <ChevronLeft className="w-4 h-4" /> Retour
       </Link>
 
-      <Card className="w-full max-w-[420px] border-none shadow-2xl rounded-[2.5rem] bg-white/95 backdrop-blur-md z-10 overflow-hidden">
+      <Card className="w-full max-w-105 border-none shadow-2xl rounded-[2.5rem] bg-white/95 backdrop-blur-md z-10 overflow-hidden">
         <CardHeader className="space-y-2 pb-8 pt-10 text-center">
           <div className="flex justify-center mb-2">
             <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-200 rotate-3">

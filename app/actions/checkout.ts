@@ -48,14 +48,14 @@ export async function initiateChariowCheckout(formData: {
 
 
   const securityToken = randomUUID();
-  
-  const cookieStore = await cookies(); // On attend les cookies d'abord
+ const cookieStore = await cookies();
   
   cookieStore.set("drenolearn_secure_payment", securityToken, {
-    httpOnly: true, // Impossible à voler via Javascript
-    secure: process.env.NODE_ENV === "production", // Sécurisé en HTTPS
-    maxAge: 60 * 60, // Expire dans 1 heure
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60, // 1 heure
     path: "/",
+    sameSite: "lax", // 👈 AJOUT IMPORTANT : Permet au cookie de survivre à la redirection externe
   });
 
   // IMPORTANT : On s'assure de passer chariow_id
