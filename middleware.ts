@@ -2,6 +2,13 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  // 🚨 1. GILET PARE-BALLES (AJOUT CRUCIAL)
+  // On laisse passer TOUTES les routes API immédiatement, sans toucher aux cookies ni à Supabase.
+  // C'est ça qui va sauver votre Webhook Chariow.
+  if (request.nextUrl.pathname.startsWith('/api')) {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -29,13 +36,12 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // 1. VÉRIFICATION DE SÉCURITÉ : On utilise getUser() et non getSession()
-  // Cela force une vérification réelle auprès de Supabase pour éviter les cookies fantômes.
+  // 2. VÉRIFICATION DE SÉCURITÉ
   const { data: { user } } = await supabase.auth.getUser()
 
   const url = request.nextUrl.clone()
 
-  // 2. PROTECTION DES ROUTES PRIVÉES
+  // 3. PROTECTION DES ROUTES PRIVÉES
   const isProtectedRoute = 
     url.pathname.startsWith('/dashboard') || 
     url.pathname.startsWith('/my-courses') || 
@@ -46,8 +52,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // 3. REDIRECTION SI DÉJÀ CONNECTÉ
-  // Si l'utilisateur est connecté et essaie d'aller sur Login ou Register, on l'envoie au Dashboard.
+  // 4. REDIRECTION SI DÉJÀ CONNECTÉ
   const isAuthPage = url.pathname === '/login' || url.pathname === '/register'
   if (user && isAuthPage) {
     url.pathname = '/dashboard'
@@ -57,10 +62,17 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
-// 4. CONFIGURATION DU MATCHER
-// On exclut les fichiers statiques, les images et l'api pour ne pas ralentir le site.
+// 5. CONFIGURATION DU MATCHER
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - images (public images)
+     * - api (API routes) -> On le garde ici aussi par sécurité
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.png$|api).*)',
   ],
 }
