@@ -54,11 +54,11 @@ export default function SuccessClient() {
 
   const [guide, setGuide] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  
+const [supabase] = useState(() => createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+));
 
   useEffect(() => {
     const fetchGuide = async () => {

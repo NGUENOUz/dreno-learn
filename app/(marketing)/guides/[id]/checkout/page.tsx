@@ -30,10 +30,10 @@ export default function GuideCheckoutPage() {
     promoCode: "" 
   });
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+ const [supabase] = useState(() => createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+));
 
   // Charger les informations du guide pour l'affichage
   useEffect(() => {
