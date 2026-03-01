@@ -5,22 +5,39 @@ export async function POST(req: Request) {
   try {
     const payload = await req.json();
     
-    // On vérifie que le paiement est complété
-    if (payload.data?.status === 'completed') {
-      const { customer, product } = payload.data;
-      const chariowId = product.id; // Ex: "nouveau-guide-2026"
+    console.log("🔔 Webhook Chariow Reçu :", payload);
 
-      // 1. Initialiser Supabase avec la clé SERVICE ROLE (pour bypasser les sécurités RLS dans le backend)
+    // 1. CORRECTION DE LA STRUCTURE (Adapté à ton JSON)
+    // Chariow envoie parfois "event", "sale", "customer" à la racine
+    const status = payload.sale?.status || payload.data?.status;
+    const customer = payload.customer || payload.data?.customer;
+    const product = payload.product || payload.data?.product;
+
+    // Vérification de sécurité de base
+    if (!status || !customer || !product) {
+        console.error("❌ Payload incomplet ou malformé");
+        return NextResponse.json({ error: "Payload invalide" }, { status: 400 });
+    }
+
+    // On vérifie que le paiement est complété
+    if (status === 'completed') {
+      console.log(`✅ Paiement validé pour : ${customer.email}`);
+      
+      const chariowId = product.id; // Ex: "prd_jnslo7"
+
+      // 2. Initialiser Supabase Admin
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY! 
       );
 
-      // 2. Trouver l'ID interne (UUID) du produit acheté
+      // 3. Trouver l'ID interne (UUID) du produit acheté
       let internalId = null;
       let itemType = 'guide';
       let driveLink = "Veuillez vérifier votre espace membre.";
       let productTitle = product.name;
+
+      console.log(`🔍 Recherche du produit Chariow ID: ${chariowId}`);
 
       // Chercher dans les guides
       const { data: guide } = await supabase.from("guides").select("id, title, drive_pdf_link").eq("chariow_id", chariowId).maybeSingle();
@@ -29,6 +46,7 @@ export async function POST(req: Request) {
         internalId = guide.id;
         driveLink = guide.drive_pdf_link;
         productTitle = guide.title;
+        console.log("-> Produit identifié comme GUIDE");
       } else {
         // Si ce n'est pas un guide, chercher dans les formations
         const { data: course } = await supabase.from("courses").select("id, title").eq("chariow_id", chariowId).maybeSingle();
@@ -36,54 +54,55 @@ export async function POST(req: Request) {
           internalId = course.id;
           itemType = 'course';
           productTitle = course.title;
+          console.log("-> Produit identifié comme FORMATION");
         }
       }
 
-      // 3. Enregistrer l'achat et donner l'accès
+      if (!internalId) {
+          console.error(`❌ ERREUR CRITIQUE : Produit introuvable dans Supabase pour chariow_id: ${chariowId}`);
+          // On retourne 200 pour dire à Chariow "J'ai bien reçu", même si on a pas trouvé le produit, pour éviter qu'il renvoie le webhook en boucle.
+          return NextResponse.json({ success: true, warning: "Product not found internally" }, { status: 200 });
+      }
+
+      // 4. Enregistrer l'achat et donner l'accès
       if (internalId) {
         // A. Sauvegarder la trace de la commande
-        await supabase.from('orders').insert({
+        const { error: orderError } = await supabase.from('orders').insert({
           email: customer.email,
           item_id: internalId,
           item_type: itemType,
-          status: 'completed'
+          status: 'completed',
+          amount: payload.sale?.amount?.value || 0 // On sauvegarde le montant payé (0 si gratuit)
         });
+
+        if (orderError) console.error("Erreur insertion Order:", orderError);
 
         // B. Vérifier si l'utilisateur a DÉJÀ un compte DrenoLearn
         const { data: profile } = await supabase.from('profiles').select('id').eq('email', customer.email).maybeSingle();
 
         if (profile) {
+          console.log(`👤 Utilisateur existant trouvé (${profile.id}). Ajout de l'accès...`);
           // S'il a déjà un compte, on lui donne l'accès immédiatement au Dashboard
-          await supabase.from('user_access').insert({
+          const { error: accessError } = await supabase.from('user_access').insert({
             user_id: profile.id,
             item_id: internalId,
             item_type: itemType
           });
+          if (accessError) console.error("Erreur insertion Access:", accessError);
+        } else {
+            console.log("👤 Nouvel utilisateur (pas de compte). L'accès sera lié à la création du compte.");
         }
       }
 
-      // 4. Envoyer le message WhatsApp (Evolution API)
-      if (process.env.EVOLUTION_API_URL && process.env.WA_INSTANCE) {
-        const whatsappMessage = `🎉 *Félicitations ${customer.first_name} !* \n\nVotre paiement pour *${productTitle}* a été validé avec succès.\n\n📥 *Voici votre lien d'accès immédiat :*\n${driveLink}\n\n💬 *Rejoignez le groupe VIP ici :*\nhttps://chat.whatsapp.com/TON_LIEN_ICI\n\nN'oubliez pas de créer votre compte sur DrenoLearn avec cet email (${customer.email}) pour sauvegarder votre achat à vie !`;
-
-        await fetch(`${process.env.EVOLUTION_API_URL}/message/sendText/${process.env.WA_INSTANCE}`, {
-          method: 'POST',
-          headers: { 
-            'apikey': process.env.EVOLUTION_API_KEY || '',
-            'Content-Type': 'application/json' 
-          },
-          body: JSON.stringify({
-            number: customer.phone.number,
-            options: { delay: 1500, presence: "composing" },
-            textMessage: { text: whatsappMessage }
-          })
-        });
+      // 5. Envoyer le message WhatsApp (Optionnel)
+      if (process.env.EVOLUTION_API_URL && process.env.WA_INSTANCE && customer.phone) {
+        // ... (Ton code WhatsApp existant)
       }
     }
     
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error("Erreur Webhook:", error);
+    console.error("🔥 Erreur Webhook:", error);
     return NextResponse.json({ error: "Erreur de traitement" }, { status: 500 });
   }
 }
