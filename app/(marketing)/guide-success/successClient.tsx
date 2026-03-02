@@ -54,7 +54,7 @@ export default function SuccessClient() {
 
   const [guide, setGuide] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  
+
 const [supabase] = useState(() => createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -147,16 +147,16 @@ const [supabase] = useState(() => createBrowserClient(
         </div>
 
         {/* UPSALE / CRÉATION DE COMPTE */}
-        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="bg-slate-900 rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl z-10 relative">
+        {/* <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="bg-slate-900 rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl z-10 relative">
            <div className="space-y-2 text-center md:text-left">
               <h3 className="text-white font-black italic uppercase text-xl flex items-center justify-center md:justify-start gap-2"><UserPlus className="w-5 h-5 text-blue-500"/> Sécurisez votre achat</h3>
               <p className="text-slate-400 text-xs font-medium max-w-sm">Créez un compte DrenoLearn gratuitement pour retrouver ce guide à vie dans votre espace membre.</p>
            </div>
-           {/* On passe l'email et le nom en paramètre pour pré-remplir la page register */}
-           <Button asChild className="w-full md:w-auto h-14 px-8 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase text-xs tracking-widest shrink-0">
+           {/* On passe l'email et le nom en paramètre pour pré-remplir la page register *
+           {/* <Button asChild className="w-full md:w-auto h-14 px-8 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase text-xs tracking-widest shrink-0">
               <Link href={`/register?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`}>Créer mon compte</Link>
-           </Button>
-        </motion.div>
+           </Button> *
+        </motion.div> */}
 
       </div>
     </div>
