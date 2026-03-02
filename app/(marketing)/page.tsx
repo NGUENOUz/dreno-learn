@@ -171,7 +171,7 @@ const EliteCard = ({ isMobileFlow = false }: { isMobileFlow?: boolean }) => (
     
     <div className="text-center mt-2">
         <p className="text-[10px] text-slate-400 font-medium flex items-center justify-center gap-1">
-            <Lock className="w-3 h-3"/> Paiement sécurisé (OM / MTN / Carte)
+            <Lock className="w-3 h-3"/> Paiement sécurisé (OM / MTN / et autres)
         </p>
     </div>
   </div>
@@ -226,7 +226,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/* --- 2. HERO SECTION --- */}
-      <section className="relative w-full min-h-[92vh] bg-slate-900 overflow-hidden flex flex-col justify-center py-6">
+      <section className="relative w-full min-h-[92vh] bg-slate-900 overflow-hidden flex flex-col justify-center pt-4 pb-15">
         <Image
           src="https://images.unsplash.com/photo-1433838552652-f9a46b332c40?q=80&w=2670&auto=format&fit=crop"
           fill
