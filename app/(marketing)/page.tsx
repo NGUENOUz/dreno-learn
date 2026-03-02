@@ -16,8 +16,8 @@ import {
   FileCheck,
   Timer,
   AlertCircle,
-  XCircle,
-  HelpCircle
+  Eye,
+  Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,12 +35,11 @@ const PRODUCT = {
   old_price: 15000,
 };
 
-// --- COMPOSANT : COMPTE À REBOURS (Timer) ---
-const CountdownTimer = () => {
+// --- COMPOSANT : COMPTE À REBOURS ---
+const CountdownTimer = ({ small = false }: { small?: boolean }) => {
   const [timeLeft, setTimeLeft] = useState({ hours: 4, minutes: 59, seconds: 0 });
 
   useEffect(() => {
-    // Timer simple pour créer l'urgence
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
@@ -53,14 +52,50 @@ const CountdownTimer = () => {
   }, []);
 
   return (
-    <div className="flex items-center gap-1.5 text-red-600 font-black font-mono text-base bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 shadow-sm animate-pulse">
-      <Timer className="w-4 h-4" />
+    <div className={`flex items-center gap-1 text-red-600 font-black font-mono ${small ? "text-xs bg-red-50/50 px-2 py-0.5" : "text-base bg-red-50 px-3 py-1.5"} rounded-lg border border-red-100 shadow-sm`}>
+      <Timer className={small ? "w-3 h-3" : "w-4 h-4"} />
       <span>{String(timeLeft.hours).padStart(2, '0')}:{String(timeLeft.minutes).padStart(2, '0')}:{String(timeLeft.seconds).padStart(2, '0')}</span>
     </div>
   );
 };
 
-// --- COMPOSANT : CARTE VISA (Preuve Visuelle) ---
+// --- COMPOSANT : PAGE APERÇU (Mockup PDF) ---
+const PreviewPage = ({ title, content, pageNum, blur = false }: { title: string, content: React.ReactNode, pageNum: number, blur?: boolean }) => (
+  <div className="min-w-[280px] md:min-w-[320px] h-[400px] md:h-[450px] bg-white border border-slate-200 shadow-xl rounded-sm p-6 relative overflow-hidden flex flex-col shrink-0 select-none cursor-grab active:cursor-grabbing">
+      {/* Filigrane */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+          <p className="text-slate-200 text-4xl font-black uppercase -rotate-45 opacity-50 whitespace-nowrap">
+              DRENO PREVIEW • 
+          </p>
+      </div>
+      
+      {/* Header Page */}
+      <div className="border-b border-slate-100 pb-2 mb-4 flex justify-between items-center opacity-50">
+          <span className="text-[8px] font-bold uppercase tracking-widest text-blue-600">Guide Entrée Express</span>
+          <span className="text-[8px] font-bold text-slate-400">Page {pageNum}</span>
+      </div>
+
+      {/* Contenu */}
+      <div className="relative z-10 h-full flex flex-col">
+          <h3 className="text-lg font-black text-slate-900 mb-3 uppercase italic leading-tight">{title}</h3>
+          <div className="text-[10px] md:text-xs text-slate-600 space-y-2 font-serif leading-relaxed text-justify">
+              {content}
+          </div>
+          
+          {/* Flou si nécessaire */}
+          {blur && (
+              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/90 to-transparent z-30 flex items-end justify-center pb-4">
+                  <div className="flex flex-col items-center gap-1">
+                      <Lock className="w-4 h-4 text-slate-400" />
+                      <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">Contenu réservé</p>
+                  </div>
+              </div>
+          )}
+      </div>
+  </div>
+);
+
+// --- COMPOSANT : CARTE VISA ---
 const VisaCard = () => (
   <motion.div 
     initial={{ y: 20, opacity: 0 }}
@@ -78,7 +113,6 @@ const VisaCard = () => (
             className="object-cover group-hover:scale-105 transition-transform duration-700"
             alt="Visa Canada Approuvé"
         />
-        {/* Overlay sombre en bas */}
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-3">
              <p className="text-white text-xs font-bold uppercase tracking-widest">
                 Approuvé sans intermédiaire
@@ -152,9 +186,45 @@ export default function Home() {
 
   return (
     <div className="w-full bg-white font-sans">
-    {/* --- 1. HERO SECTION : L'ACCROCHE ÉMOTIONNELLE --- */}
+      
+      {/* --- 1. BARRE FIXE DESKTOP --- */}
+      <AnimatePresence>
+        {showStickyCTA && (
+          <motion.div
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            exit={{ y: -100 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="hidden lg:flex fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-slate-200 p-3 z-50 shadow-lg justify-between items-center px-8"
+          >
+             <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center text-white font-black italic shadow-md">D</div>
+                <div>
+                    <h3 className="font-black text-slate-900 text-sm uppercase italic">Guide Entrée Express 2026</h3>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-green-600 font-bold flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/> Vérifié</span>
+                        <CountdownTimer small={true} />
+                    </div>
+                </div>
+             </div>
+
+             <div className="flex items-center gap-6">
+                 <div className="text-right">
+                     <p className="text-xs text-slate-400 font-bold line-through decoration-red-500">{PRODUCT.old_price} F</p>
+                     <p className="text-2xl font-black text-slate-900 leading-none italic">{PRODUCT.price} F</p>
+                 </div>
+                 <Button asChild className="h-12 bg-green-600 hover:bg-green-700 text-white font-black px-8 rounded-xl uppercase italic shadow-lg shadow-green-200 transition-transform hover:scale-105">
+                    <Link href={`/guides/${PRODUCT.id}/checkout`}>
+                        Télécharger
+                    </Link>
+                 </Button>
+             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- 2. HERO SECTION --- */}
       <section className="relative w-full min-h-[92vh] bg-slate-900 overflow-hidden flex flex-col justify-center py-20">
-        {/* Image de fond sombre et immersive */}
         <Image
           src="https://images.unsplash.com/photo-1433838552652-f9a46b332c40?q=80&w=2670&auto=format&fit=crop"
           fill
@@ -166,7 +236,6 @@ export default function Home() {
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 grid lg:grid-cols-2 gap-12 items-center">
           
-          {/* Colonne Texte */}
           <div className="space-y-8 text-center lg:text-left pt-10 md:pt-0">
             <motion.div 
                 initial={{ opacity: 0, x: -20 }}
@@ -177,24 +246,22 @@ export default function Home() {
             </motion.div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] tracking-tighter uppercase italic">
-              "Les gens comme toi obtiennent ce Visa <br/>
+              "Les gens comme toi obtiennent leur Visa <br/>
               <span className="text-blue-500">Sans Agence</span>."
             </h1>
 
-            <div className="space-y-6 max-w-xl mx-auto lg:mx-0 text-lg md:text-xl leading-relaxed text-slate-300 font-medium">
-                <p>
+            <div className="space-y-4 max-w-xl mx-auto lg:mx-0">
+                <p className="text-slate-300 text-lg md:text-xl font-medium leading-relaxed">
                   Arrête de croire qu'il faut forcément être riche ou avoir un gros diplôme pour lancer ta procédure.
                 </p>
-                <div className="bg-white/5 border-l-4 border-blue-500 p-4 rounded-r-xl backdrop-blur-sm">
-                  <p className="text-white">
-                    <span className="text-blue-400 font-bold">La vérité ?</span> Si tu sais lire et suivre des instructions simples, tu peux monter ton dossier toi-même pour le programme <span className="underline decoration-blue-500/50">Entrée Express</span>.
-                  </p>
-                </div>
+                <p className="text-white text-lg md:text-xl font-bold border-l-4 border-blue-500 pl-4">
+                  Si tu sais lire et suivre des instructions, tu peux monter ton dossier toi-même pour le programme <span className="text-blue-400">Entrée Express</span> et être sélectionné.
+                </p>
             </div>
             
             <div className="pt-6 flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start">
                  <Button asChild className="h-16 px-10 bg-white hover:bg-slate-100 text-slate-900 text-lg font-black uppercase italic rounded-full shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)] transition-transform hover:scale-105">
-                    <Link href="#NextStape">Comment est-ce possible ?</Link>
+                    <Link href="#comment-ca-marche">Comment est-ce possible ?</Link>
                  </Button>
                  
                  <div className="flex items-center gap-3">
@@ -213,12 +280,10 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Colonne Visuelle (Le Rêve) */}
           <div className="flex flex-col items-center lg:items-end justify-center relative mt-8 lg:mt-0">
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-500/20 blur-[100px] rounded-full pointer-events-none" />
              <VisaCard />
              
-             {/* Bulle de notification */}
              <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -230,15 +295,14 @@ export default function Home() {
                      <p className="text-[10px] text-slate-400 font-bold uppercase">En direct du groupe</p>
                  </div>
                  <p className="text-white text-xs italic">
-                    "Je pensais pas que c'était aussi simple. Dossier soumis !"
+                    "J'ai reçu mon invitation à résider ce matin ! Merci pour le guide."
                  </p>
-                 <p className="text-slate-400 text-[10px] font-bold mt-2 text-right">- Brice, Yaoundé</p>
+                 <p className="text-slate-400 text-xs font-bold mt-2 text-right">- Marc, Douala</p>
              </motion.div>
           </div>
 
         </div>
 
-        {/* Bannière de réassurance */}
         <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-lg border-t border-white/5 py-4 z-20">
              <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-6 md:gap-16 px-4">
                  <div className="flex items-center gap-3 text-white/90 text-xs font-bold uppercase tracking-wide">
@@ -257,16 +321,17 @@ export default function Home() {
         </div>
       </section>
 
-     {/* --- 2. LA RÉVÉLATION (Éducation & Transition) --- */}
+      {/* --- 3. LA MÉTHODE (Éducation) --- */}
       <section id="comment-ca-marche" className="py-24 px-4 max-w-5xl mx-auto">
-         <div className="text-center mb-16 space-y-6" id="NextStape">
+         <div className="text-center mb-16 space-y-6">
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 uppercase italic leading-none">
-                Le Secret, c'est <span className="text-blue-600">Les Points</span>.
+                Le Secret : C'est <span className="text-blue-600">Des Points</span>.
             </h2>
             <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full" />
             <p className="text-slate-600 text-lg md:text-xl font-medium max-w-3xl mx-auto leading-relaxed">
-                Le Canada ne choisit pas les gens "à la tête". C'est mathématique. 
-                Tu valides des étapes, tu gagnes des points. Si ton score est bon, l'ordinateur t'envoie une invitation. C'est aussi simple que ça.
+                Le programme <strong>Entrée Express</strong> ne choisit pas les gens "au hasard". 
+                C'est un système logique. Tu valides des étapes, tu gagnes des points.
+                Si tu as le bon score, le Canada t'invite. C'est mathématique.
             </p>
          </div>
 
@@ -302,7 +367,6 @@ export default function Home() {
              </div>
          </div>
          
-         {/* BLOC DE TRANSITION : POURQUOI LE GUIDE ? */}
          <div className="bg-slate-900 text-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
             
@@ -334,15 +398,73 @@ export default function Home() {
             </div>
          </div>
       </section>
-      {/* --- 3. PRÉSENTATION DU GUIDE (La Solution) --- */}
+
+      {/* --- 4. APERÇU DU GUIDE (NOUVEAU) --- */}
+      <section className="py-24 bg-slate-50 overflow-hidden">
+          <div className="text-center mb-10 space-y-4">
+              <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest">
+                  <Eye className="w-4 h-4" /> Coup d'œil exclusif
+              </span>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 uppercase italic leading-none">
+                  Feuilletez le <span className="text-blue-600">Dossier</span>
+              </h2>
+              <p className="text-slate-500 text-sm md:text-base max-w-lg mx-auto">
+                  Voici concrètement ce que tu vas recevoir. Pas de théorie inutile, juste des étapes claires à suivre.
+              </p>
+          </div>
+
+          {/* Carousel Container */}
+          <div className="flex overflow-x-auto pb-10 px-6 gap-6 md:justify-center no-scrollbar">
+              
+              {/* PAGE 1 : Introduction */}
+              <PreviewPage 
+                pageNum={3}
+                title="INTRODUCTION : Stop aux mythes"
+                content={
+                    <>
+                        <p>90% des Africains pensent que pour immigrer au Canada, il faut forcément passer par une agence de voyages ou être millionnaire. C'est une illusion.</p>
+                        <p className="mt-4">Ce guide est votre boussole. Si vous faites la procédure seul, vous gardez le contrôle. Si vous avez déjà une agence, ce guide est votre garde-fou pour vérifier leur travail et éviter les surfacturations.</p>
+                    </>
+                }
+              />
+
+              {/* PAGE 2 : Sommaire */}
+              <PreviewPage 
+                pageNum={2}
+                title="SOMMAIRE STRATÉGIQUE"
+                content={
+                    <ul className="space-y-3 font-bold text-slate-700">
+                        <li className="flex justify-between"><span>I - LES PRÉREQUIS (EDE & LANGUE)</span> <span>P.4</span></li>
+                        <li className="flex justify-between"><span>II - QUE FAIRE UNE FOIS PRÊT ?</span> <span>P.8</span></li>
+                        <li className="flex justify-between text-blue-600"><span>III - TROUVER UN EMPLOI (AFRIQUE)</span> <span>P.14</span></li>
+                        <li className="flex justify-between"><span>IV - LA LOGIQUE DES POINTS</span> <span>P.23</span></li>
+                    </ul>
+                }
+              />
+
+              {/* PAGE 3 : Contenu Flouté */}
+              <PreviewPage 
+                pageNum={14}
+                title="TROUVER UN EMPLOI (OFFICIEL)"
+                blur={true}
+                content={
+                    <>
+                        <p>Il existe des milliers d'offres d'emploi au Canada ouvertes aux étrangers. Mais attention, votre CV format "français" ou "local" ira directement à la poubelle.</p>
+                        <p className="mt-4 font-bold">L'outil secret : Le Guichet-Emplois</p>
+                        <p className="mt-2">Pour accéder aux offres qui recrutent réellement à l'international, vous devez filtrer votre recherche en cochant la case...</p>
+                    </>
+                }
+              />
+          </div>
+      </section>
+
+      {/* --- 5. LA SOLUTION (Guide) --- */}
       <section className="bg-slate-900 py-24 px-4 overflow-hidden relative">
-         {/* Déco de fond */}
          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-green-600/10 rounded-full blur-3xl pointer-events-none" />
 
          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
              
-             {/* Colonne Texte */}
              <div className="space-y-10 order-2 lg:order-1">
                  <div>
                      <span className="inline-block px-3 py-1 rounded bg-blue-500/20 text-blue-300 font-black uppercase tracking-widest text-[10px] mb-4">
@@ -386,13 +508,9 @@ export default function Home() {
                  </div>
              </div>
 
-             {/* Colonne Visuelle */}
              <div className="relative order-1 lg:order-2 flex justify-center">
-                 {/* Visuel Guide */}
                  <div className="relative w-full max-w-md aspect-[4/5] bg-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden border-8 border-slate-700 transform rotate-3 hover:rotate-0 transition-transform duration-500 group">
-                     
                      <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[url('https://www.canada.ca/content/dam/ircc/images/services/visit/visit-canada.jpg')] bg-cover bg-center opacity-50 group-hover:opacity-60 transition-opacity" />
-                     
                      <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-8">
                          <div className="border-4 border-yellow-400 p-8 rounded-2xl bg-black/40 backdrop-blur-sm">
                              <h3 className="text-5xl font-black text-white uppercase italic leading-none mb-2">GUIDE<br/>ULTIME</h3>
@@ -404,7 +522,6 @@ export default function Home() {
                      </div>
                  </div>
 
-                 {/* Badge Bonus Flottant */}
                  <div className="absolute -bottom-10 -left-4 md:-left-10 bg-white text-slate-900 p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-100 max-w-[240px] z-20 animate-bounce-slow">
                      <p className="text-xs font-black uppercase text-green-600 mb-2 flex items-center gap-2">
                         <MessageSquare className="w-4 h-4 fill-green-600"/> Bonus Gratuit
@@ -418,8 +535,8 @@ export default function Home() {
          </div>
       </section>
 
-      {/* --- 4. LES BONUS (La Valeur Ajoutée) --- */}
-      <section className="py-24 px-4 bg-slate-50">
+      {/* --- 6. LES BONUS --- */}
+      <section className="py-24 px-4 bg-white">
           <div className="max-w-5xl mx-auto text-center space-y-12">
               <div className="space-y-4">
                   <h2 className="text-3xl md:text-4xl font-black text-slate-900 italic uppercase leading-none">
@@ -429,8 +546,7 @@ export default function Home() {
               </div>
 
               <div className="grid md:grid-cols-3 gap-6 text-left">
-                  {/* Bonus 1 */}
-                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
+                  <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110" />
                       <Briefcase className="w-10 h-10 text-blue-600 mb-6 relative z-10" />
                       <h4 className="font-black text-xl text-slate-900 mb-3 uppercase italic">CV Canadien</h4>
@@ -439,8 +555,7 @@ export default function Home() {
                       </p>
                   </div>
 
-                  {/* Bonus 2 */}
-                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
+                  <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-100 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110" />
                       <FileCheck className="w-10 h-10 text-yellow-500 mb-6 relative z-10" />
                       <h4 className="font-black text-xl text-slate-900 mb-3 uppercase italic">Templates Lettres</h4>
@@ -449,8 +564,7 @@ export default function Home() {
                       </p>
                   </div>
 
-                  {/* Bonus 3 */}
-                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
+                  <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-green-100 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110" />
                       <Users className="w-10 h-10 text-green-600 mb-6 relative z-10" />
                       <h4 className="font-black text-xl text-slate-900 mb-3 uppercase italic">Réseau VIP</h4>
@@ -462,7 +576,7 @@ export default function Home() {
           </div>
       </section>
 
-      {/* --- 5. L'OFFRE FINALE (Urgence) --- */}
+      {/* --- 7. OFFRE FINALE --- */}
       <section className="py-24 px-4 bg-white">
           <div className="max-w-3xl mx-auto">
               <div className="text-center mb-10 space-y-4">
@@ -478,7 +592,6 @@ export default function Home() {
                   </p>
               </div>
 
-              {/* Carte Achat Finale */}
               <EliteCard isMobileFlow={false} />
 
               <div className="mt-12 text-center space-y-4">
@@ -504,7 +617,7 @@ export default function Home() {
           </div>
       </section>
 
-      {/* --- 6. STICKY MOBILE CTA (Bas de page) --- */}
+      {/* --- 8. STICKY MOBILE CTA --- */}
       <AnimatePresence>
         {showStickyCTA && (
           <motion.div
@@ -551,6 +664,13 @@ export default function Home() {
         }
         .animate-bounce-slow {
             animation: bounce-slow 3s infinite ease-in-out;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
       `}</style>
     </div>
