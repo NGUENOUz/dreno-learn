@@ -226,7 +226,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/* --- 2. HERO SECTION --- */}
-      <section className="relative w-full min-h-[92vh] bg-slate-900 overflow-hidden flex flex-col justify-center py-10">
+      <section className="relative w-full min-h-[92vh] bg-slate-900 overflow-hidden flex flex-col justify-center py-6">
         <Image
           src="https://images.unsplash.com/photo-1433838552652-f9a46b332c40?q=80&w=2670&auto=format&fit=crop"
           fill
