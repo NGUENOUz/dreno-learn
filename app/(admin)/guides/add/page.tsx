@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { 
-  Sparkles, Save, Eye, Loader2, Upload, 
-  Plus, Trash2, ArrowLeft, Globe, Link as LinkIcon, Hash, BookOpen, Zap, FileText, Target, Tag
+  Sparkles, Save, Eye, Loader2, 
+  Plus, Trash2, ArrowLeft, Globe, Link as Hash, BookOpen, FileText, Target, Tag
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -93,6 +93,7 @@ export default function AdminNewGuide() {
       toast.success("Guide publié avec succès !");
       router.push("/admin/guides");
       router.refresh();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(`Erreur Supabase : ${err.message}`);
     } finally { setIsPublishing(false); }
@@ -119,7 +120,7 @@ export default function AdminNewGuide() {
         <section className="p-10 border-r border-slate-50 space-y-12 overflow-y-auto max-h-[calc(100vh-80px)]">
           
           {/* MAGIC FILL IA */}
-          <div className="bg-gradient-to-br from-blue-600/5 to-purple-600/5 p-8 rounded-[2.5rem] border border-blue-100 border-dashed relative group">
+          <div className="bg-linear-to-br from-blue-600/5 to-purple-600/5 p-8 rounded-[2.5rem] border border-blue-100 border-dashed relative group">
             <div className="flex flex-col items-center text-center space-y-4">
               <Sparkles className="w-8 h-8 text-blue-600 group-hover:rotate-12 transition-transform" />
               <div>
@@ -137,7 +138,7 @@ export default function AdminNewGuide() {
             {/* INFOS DE BASE */}
             <div className="space-y-6">
               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
-                <div className="w-4 h-[2px] bg-blue-600" /> Informations de base
+                <div className="w-4 h-0.5 bg-blue-600" /> Informations de base
               </h4>
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -177,7 +178,7 @@ export default function AdminNewGuide() {
             {/* CONFIGURATION TECHNIQUE */}
             <div className="space-y-6">
               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
-                <div className="w-4 h-[2px] bg-blue-600" /> Livraison & Tracking
+                <div className="w-4 h-0.5 bg-blue-600" /> Livraison & Tracking
               </h4>
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -194,7 +195,7 @@ export default function AdminNewGuide() {
             {/* PRIX & OBJECTIFS */}
             <div className="space-y-6">
               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
-                <div className="w-4 h-[2px] bg-blue-600" /> Business Model
+                <div className="w-4 h-0.5 bg-blue-600" /> Business Model
               </h4>
               <div className="grid grid-cols-3 gap-6">
                 <div className="space-y-2">
@@ -215,7 +216,7 @@ export default function AdminNewGuide() {
             {/* DESCRIPTIONS & SOMMAIRE */}
             <div className="space-y-8">
               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
-                <div className="w-4 h-[2px] bg-blue-600" /> Contenu & Marketing
+                <div className="w-4 h-0.5 bg-blue-600" /> Contenu & Marketing
               </h4>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-2">Accroche Carte (Courte)</label>
@@ -223,7 +224,7 @@ export default function AdminNewGuide() {
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-2">Marketing Description (Storytelling)</label>
-                <textarea rows={4} value={form.marketing_description} onChange={(e) => setForm({...form, marketing_description: e.target.value})} className="w-full bg-slate-50 rounded-[2rem] p-6 font-medium text-slate-600 border-none resize-none focus:ring-2 ring-blue-50" />
+                <textarea rows={4} value={form.marketing_description} onChange={(e) => setForm({...form, marketing_description: e.target.value})} className="w-full bg-slate-50 rounded-4xl p-6 font-medium text-slate-600 border-none resize-none focus:ring-2 ring-blue-50" />
               </div>
 
               {/* SOMMAIRE JSONB */}
@@ -236,7 +237,7 @@ export default function AdminNewGuide() {
                 </div>
                 <div className="space-y-4">
                   {form.content_list.map((chapter, index) => (
-                    <div key={index} className="group bg-slate-50 p-6 rounded-[2rem] relative border border-transparent hover:border-blue-100 transition-all">
+                    <div key={index} className="group bg-slate-50 p-6 rounded-4xl relative border border-transparent hover:border-blue-100 transition-all">
                       <button onClick={() => removeChapter(index)} className="absolute top-4 right-4 text-slate-300 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                       <div className="space-y-3">
                          <input placeholder="Titre..." value={chapter.title} onChange={(e) => updateChapter(index, "title", e.target.value)} className="w-full bg-transparent font-black italic uppercase text-xs text-slate-900 border-none p-0 focus:ring-0" />
@@ -253,7 +254,7 @@ export default function AdminNewGuide() {
         {/* PREVIEW */}
         <section className="bg-slate-50/50 p-10 flex flex-col items-center justify-center relative overflow-hidden">
           <Globe className="absolute inset-0 z-0 opacity-[0.03] w-full h-full text-slate-900" />
-          <div className="relative z-10 w-full max-w-[400px] space-y-12">
+          <div className="relative z-10 w-full max-w-100 space-y-12">
             <div className="text-center">
                <p className="text-[10px] font-black text-blue-600 uppercase italic flex items-center justify-center gap-2"><Eye className="w-3 h-3" /> Live Marketplace Preview</p>
             </div>
