@@ -15,9 +15,6 @@ export default function MarketingLayout({
       <main className="grow flex flex-col">
         {children}
         <ExitIntentPopup />
-        <Suspense fallback={null}>
-            <FacebookPixel />
-        </Suspense>
       </main>
       
     </>
