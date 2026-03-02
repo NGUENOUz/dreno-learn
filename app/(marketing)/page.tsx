@@ -17,7 +17,7 @@ import {
   Timer,
   AlertCircle,
   Eye,
-  Search
+  ZoomIn
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,6 +34,15 @@ const PRODUCT = {
   price: 2900,
   old_price: 15000,
 };
+
+// --- IMAGES DU GUIDE (Cloudinary) ---
+const GUIDE_IMAGES = [
+    { src: "https://res.cloudinary.com/dcsl6xhli/image/upload/v1772423462/guide_entr%C3%A9e_express_canada_odl7i3.png", title: "Sommaire Détaillé" },
+    { src: "https://res.cloudinary.com/dcsl6xhli/image/upload/v1772423462/guide_entr%C3%A9e_express_canada_1_yegxvd.png", title: "Contenu Stratégique" },
+    { src: "https://res.cloudinary.com/dcsl6xhli/image/upload/v1772423462/guide_entr%C3%A9e_express_canada_2_rsra2r.png", title: "Conclusion & Bonus" }
+];
+const COVER_IMAGE = "https://res.cloudinary.com/dcsl6xhli/image/upload/v1772423462/guide_entr%C3%A9e_express_canada_3_hqgkmm.png";
+
 
 // --- COMPOSANT : COMPTE À REBOURS ---
 const CountdownTimer = ({ small = false }: { small?: boolean }) => {
@@ -59,38 +68,30 @@ const CountdownTimer = ({ small = false }: { small?: boolean }) => {
   );
 };
 
-// --- COMPOSANT : PAGE APERÇU (Mockup PDF) ---
-const PreviewPage = ({ title, content, pageNum, blur = false }: { title: string, content: React.ReactNode, pageNum: number, blur?: boolean }) => (
-  <div className="min-w-[280px] md:min-w-[320px] h-[400px] md:h-[450px] bg-white border border-slate-200 shadow-xl rounded-sm p-6 relative overflow-hidden flex flex-col shrink-0 select-none cursor-grab active:cursor-grabbing">
-      {/* Filigrane */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-          <p className="text-slate-200 text-4xl font-black uppercase -rotate-45 opacity-50 whitespace-nowrap">
-              DRENO PREVIEW • 
+// --- COMPOSANT : PAGE APERÇU (Image Réelle) ---
+const PreviewPage = ({ src, title }: { src: string, title: string }) => (
+  <div className="min-w-[260px] md:min-w-[300px] h-[380px] md:h-[420px] bg-white border border-slate-200 shadow-xl rounded-sm p-2 relative overflow-hidden flex flex-col shrink-0 select-none group cursor-zoom-in">
+      {/* Filigrane de Protection */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 bg-white/5 backdrop-blur-[1px]">
+          <p className="text-slate-900/10 text-3xl font-black uppercase -rotate-45 whitespace-nowrap select-none">
+              DRENOLEARN • PREVIEW
           </p>
       </div>
       
       {/* Header Page */}
-      <div className="border-b border-slate-100 pb-2 mb-4 flex justify-between items-center opacity-50">
-          <span className="text-[8px] font-bold uppercase tracking-widest text-blue-600">Guide Entrée Express</span>
-          <span className="text-[8px] font-bold text-slate-400">Page {pageNum}</span>
+      <div className="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-white to-transparent z-30 flex justify-between items-center">
+          <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 bg-white px-2 py-1 rounded-full shadow-sm">{title}</span>
+          <ZoomIn className="w-4 h-4 text-slate-300" />
       </div>
 
-      {/* Contenu */}
-      <div className="relative z-10 h-full flex flex-col">
-          <h3 className="text-lg font-black text-slate-900 mb-3 uppercase italic leading-tight">{title}</h3>
-          <div className="text-[10px] md:text-xs text-slate-600 space-y-2 font-serif leading-relaxed text-justify">
-              {content}
-          </div>
-          
-          {/* Flou si nécessaire */}
-          {blur && (
-              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/90 to-transparent z-30 flex items-end justify-center pb-4">
-                  <div className="flex flex-col items-center gap-1">
-                      <Lock className="w-4 h-4 text-slate-400" />
-                      <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">Contenu réservé</p>
-                  </div>
-              </div>
-          )}
+      {/* Image Contenu */}
+      <div className="relative w-full h-full overflow-hidden bg-slate-50">
+          <Image 
+            src={src} 
+            alt={title} 
+            fill 
+            className="object-contain object-top group-hover:scale-105 transition-transform duration-700 ease-out" 
+          />
       </div>
   </div>
 );
@@ -151,7 +152,7 @@ const EliteCard = ({ isMobileFlow = false }: { isMobileFlow?: boolean }) => (
 
     <Button
       asChild
-      className="w-full h-16 bg-green-600 hover:bg-green-700 text-white font-black rounded-2xl text-lg shadow-xl shadow-green-200 group relative overflow-hidden transition-all active:scale-95 uppercase italic"
+      className="w-full h-16 bg-green-600 hover:bg-green-700 text-white font-black rounded-2xl text-lg shadow-xl shadow-green-200 group relative overflow-hidden active:scale-95 uppercase italic animate-pulse-fast"
     >
       <Link href={`/guides/${PRODUCT.id}/checkout`}>
         TÉLÉCHARGER MAINTENANT <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -213,7 +214,7 @@ export default function Home() {
                      <p className="text-xs text-slate-400 font-bold line-through decoration-red-500">{PRODUCT.old_price} F</p>
                      <p className="text-2xl font-black text-slate-900 leading-none italic">{PRODUCT.price} F</p>
                  </div>
-                 <Button asChild className="h-12 bg-green-600 hover:bg-green-700 text-white font-black px-8 rounded-xl uppercase italic shadow-lg shadow-green-200 transition-transform hover:scale-105">
+                 <Button asChild className="h-12 bg-green-600 hover:bg-green-700 text-white font-black px-8 rounded-xl uppercase italic shadow-lg shadow-green-200 transition-transform hover:scale-105 animate-pulse-fast">
                     <Link href={`/guides/${PRODUCT.id}/checkout`}>
                         Télécharger
                     </Link>
@@ -282,7 +283,7 @@ export default function Home() {
 
           <div className="flex flex-col items-center lg:items-end justify-center relative mt-8 lg:mt-0">
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-500/20 blur-[100px] rounded-full pointer-events-none" />
-             <VisaCard />
+             
              
              <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -353,7 +354,7 @@ export default function Home() {
                      { 
                          step: "3", 
                          title: "L'Invitation (RP)", 
-                         desc: "Les profils avec les meilleurs scores sont sélectionnés. Tu reçois le mail qui change ta vie et tu prépares tes valises." 
+                         desc: "Les meilleurs profils sont sélectionnés. Tu reçois le mail qui change ta vie et tu prépares tes valises." 
                      }
                  ].map((item, i) => (
                      <div key={i} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl text-center hover:-translate-y-2 transition-transform duration-300 group">
@@ -399,9 +400,9 @@ export default function Home() {
          </div>
       </section>
 
-      {/* --- 4. APERÇU DU GUIDE (NOUVEAU) --- */}
+      {/* --- 4. APERÇU DU GUIDE (CARROUSEL RÉEL) --- */}
       <section className="py-24 bg-slate-50 overflow-hidden">
-          <div className="text-center mb-10 space-y-4">
+          <div className="text-center mb-12 space-y-4">
               <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest">
                   <Eye className="w-4 h-4" /> Coup d'œil exclusif
               </span>
@@ -413,52 +414,15 @@ export default function Home() {
               </p>
           </div>
 
-          {/* Carousel Container */}
-          <div className="flex overflow-x-auto pb-10 px-6 gap-6 md:justify-center no-scrollbar">
-              
-              {/* PAGE 1 : Introduction */}
-              <PreviewPage 
-                pageNum={3}
-                title="INTRODUCTION : Stop aux mythes"
-                content={
-                    <>
-                        <p>90% des Africains pensent que pour immigrer au Canada, il faut forcément passer par une agence de voyages ou être millionnaire. C'est une illusion.</p>
-                        <p className="mt-4">Ce guide est votre boussole. Si vous faites la procédure seul, vous gardez le contrôle. Si vous avez déjà une agence, ce guide est votre garde-fou pour vérifier leur travail et éviter les surfacturations.</p>
-                    </>
-                }
-              />
-
-              {/* PAGE 2 : Sommaire */}
-              <PreviewPage 
-                pageNum={2}
-                title="SOMMAIRE STRATÉGIQUE"
-                content={
-                    <ul className="space-y-3 font-bold text-slate-700">
-                        <li className="flex justify-between"><span>I - LES PRÉREQUIS (EDE & LANGUE)</span> <span>P.4</span></li>
-                        <li className="flex justify-between"><span>II - QUE FAIRE UNE FOIS PRÊT ?</span> <span>P.8</span></li>
-                        <li className="flex justify-between text-blue-600"><span>III - TROUVER UN EMPLOI (AFRIQUE)</span> <span>P.14</span></li>
-                        <li className="flex justify-between"><span>IV - LA LOGIQUE DES POINTS</span> <span>P.23</span></li>
-                    </ul>
-                }
-              />
-
-              {/* PAGE 3 : Contenu Flouté */}
-              <PreviewPage 
-                pageNum={14}
-                title="TROUVER UN EMPLOI (OFFICIEL)"
-                blur={true}
-                content={
-                    <>
-                        <p>Il existe des milliers d'offres d'emploi au Canada ouvertes aux étrangers. Mais attention, votre CV format "français" ou "local" ira directement à la poubelle.</p>
-                        <p className="mt-4 font-bold">L'outil secret : Le Guichet-Emplois</p>
-                        <p className="mt-2">Pour accéder aux offres qui recrutent réellement à l'international, vous devez filtrer votre recherche en cochant la case...</p>
-                    </>
-                }
-              />
+          {/* Carousel Container (Scroll Horizontal) */}
+          <div className="flex overflow-x-auto pb-10 px-6 gap-6 md:justify-center no-scrollbar items-center">
+              {GUIDE_IMAGES.map((img, index) => (
+                  <PreviewPage key={index} src={img.src} title={img.title} />
+              ))}
           </div>
       </section>
 
-      {/* --- 5. LA SOLUTION (Guide) --- */}
+      {/* --- 5. LA SOLUTION (Mockup) --- */}
       <section className="bg-slate-900 py-24 px-4 overflow-hidden relative">
          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-green-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -509,15 +473,21 @@ export default function Home() {
              </div>
 
              <div className="relative order-1 lg:order-2 flex justify-center">
+                 {/* Visuel Guide avec Couverture Réelle */}
                  <div className="relative w-full max-w-md aspect-[4/5] bg-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden border-8 border-slate-700 transform rotate-3 hover:rotate-0 transition-transform duration-500 group">
-                     <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-[url('https://www.canada.ca/content/dam/ircc/images/services/visit/visit-canada.jpg')] bg-cover bg-center opacity-50 group-hover:opacity-60 transition-opacity" />
-                     <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-8">
-                         <div className="border-4 border-yellow-400 p-8 rounded-2xl bg-black/40 backdrop-blur-sm">
-                             <h3 className="text-5xl font-black text-white uppercase italic leading-none mb-2">GUIDE<br/>ULTIME</h3>
-                             <p className="text-yellow-400 font-bold tracking-widest uppercase text-sm">Entrée Express 2026</p>
-                         </div>
-                         <div className="mt-8 space-y-2">
-                             <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase">Version PDF Complète</span>
+                     {/* IMAGE DE COUVERTURE RÉELLE EN BACKGROUND */}
+                     <Image 
+                        src={COVER_IMAGE}
+                        alt="Couverture Guide"
+                        fill
+                        className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
+                     />
+                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent pointer-events-none" />
+                     
+                     <div className="absolute inset-0 flex flex-col items-center justify-end z-10 p-8 pb-16">
+                         <div className="border-2 border-white/20 p-6 rounded-2xl bg-black/40 backdrop-blur-md w-full">
+                             <h3 className="text-3xl font-black text-white uppercase italic leading-none mb-2">GUIDE COMPLET</h3>
+                             <p className="text-yellow-400 font-bold tracking-widest uppercase text-xs">Entrée Express 2026</p>
                          </div>
                      </div>
                  </div>
@@ -536,7 +506,7 @@ export default function Home() {
       </section>
 
       {/* --- 6. LES BONUS --- */}
-      <section className="py-24 px-4 bg-white">
+      <section className="py-24 px-4 bg-slate-50">
           <div className="max-w-5xl mx-auto text-center space-y-12">
               <div className="space-y-4">
                   <h2 className="text-3xl md:text-4xl font-black text-slate-900 italic uppercase leading-none">
@@ -546,7 +516,7 @@ export default function Home() {
               </div>
 
               <div className="grid md:grid-cols-3 gap-6 text-left">
-                  <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
+                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110" />
                       <Briefcase className="w-10 h-10 text-blue-600 mb-6 relative z-10" />
                       <h4 className="font-black text-xl text-slate-900 mb-3 uppercase italic">CV Canadien</h4>
@@ -555,7 +525,7 @@ export default function Home() {
                       </p>
                   </div>
 
-                  <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
+                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-100 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110" />
                       <FileCheck className="w-10 h-10 text-yellow-500 mb-6 relative z-10" />
                       <h4 className="font-black text-xl text-slate-900 mb-3 uppercase italic">Templates Lettres</h4>
@@ -564,7 +534,7 @@ export default function Home() {
                       </p>
                   </div>
 
-                  <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
+                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-green-100 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110" />
                       <Users className="w-10 h-10 text-green-600 mb-6 relative z-10" />
                       <h4 className="font-black text-xl text-slate-900 mb-3 uppercase italic">Réseau VIP</h4>
@@ -644,7 +614,7 @@ export default function Home() {
             
             <Button
               asChild
-              className="h-12 px-6 bg-green-600 text-white font-black rounded-xl uppercase italic shadow-lg active:scale-95 transition-all"
+              className="h-12 px-6 bg-green-600 text-white font-black rounded-xl uppercase italic shadow-lg active:scale-95 transition-all animate-pulse-fast"
             >
               <Link href={`/guides/${PRODUCT.id}/checkout`}>
                 Télécharger <ArrowRight className="w-4 h-4 ml-2" />
@@ -664,6 +634,13 @@ export default function Home() {
         }
         .animate-bounce-slow {
             animation: bounce-slow 3s infinite ease-in-out;
+        }
+        @keyframes pulse-fast {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+            50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+        }
+        .animate-pulse-fast {
+            animation: pulse-fast 2s infinite;
         }
         .no-scrollbar::-webkit-scrollbar {
             display: none;
