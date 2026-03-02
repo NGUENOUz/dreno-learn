@@ -66,7 +66,7 @@ const CountdownTimer = ({ small = false }: { small?: boolean }) => {
 
 // --- COMPOSANT : PAGE APERÇU (Image Réelle) ---
 const PreviewPage = ({ src, title }: { src: string, title: string }) => (
-  <div className="min-w-[260px] md:min-w-[300px] h-[380px] md:h-[420px] bg-white border border-slate-200 shadow-xl rounded-sm p-2 relative overflow-hidden flex flex-col shrink-0 select-none group cursor-zoom-in">
+  <div className="min-w-65 md:min-w-[300px] h-[380px] md:h-[420px] bg-white border border-slate-200 shadow-xl rounded-sm p-2 relative overflow-hidden flex flex-col shrink-0 select-none group cursor-zoom-in">
       {/* Filigrane de Protection */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 bg-white/5 backdrop-blur-[1px]">
           <p className="text-slate-900/10 text-3xl font-black uppercase -rotate-45 whitespace-nowrap select-none">
@@ -92,32 +92,7 @@ const PreviewPage = ({ src, title }: { src: string, title: string }) => (
   </div>
 );
 
-// --- COMPOSANT : CARTE VISA ---
-const VisaCard = () => (
-  <motion.div 
-    initial={{ y: 20, opacity: 0 }}
-    animate={{ y: 0, opacity: 1 }}
-    transition={{ delay: 0.5, duration: 0.8 }}
-    className="relative bg-white p-3 rounded-2xl shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500 border-4 border-white max-w-[300px] md:max-w-sm mx-auto md:mx-0 group"
-  >
-    <div className="absolute -top-4 -right-4 bg-green-500 text-white p-3 rounded-full shadow-lg z-20 border-4 border-slate-900">
-        <CheckCircle2 className="w-8 h-8" />
-    </div>
-    <div className="relative h-48 md:h-60 w-full overflow-hidden rounded-xl bg-slate-100">
-        <Image 
-            src="https://noticias.imer.mx/wp-content/uploads/2024/02/visa-canada-mexicanos-290224.jpg" 
-            fill 
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
-            alt="Visa Canada Approuvé"
-        />
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-3">
-             <p className="text-white text-xs font-bold uppercase tracking-widest">
-                Approuvé sans intermédiaire
-             </p>
-        </div>
-    </div>
-  </motion.div>
-);
+
 
 // --- COMPOSANT : CARTE D'ACHAT (Elite Card) ---
 const EliteCard = ({ isMobileFlow = false }: { isMobileFlow?: boolean }) => (
@@ -249,7 +224,7 @@ export default function Home() {
           alt="Voyage Canada"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-900/30" />
+        <div className="absolute inset-0 bg-linear-to-r from-slate-950 via-slate-950/80 to-slate-900/30" />
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 grid lg:grid-cols-2 gap-12 items-center">
           
@@ -263,13 +238,13 @@ export default function Home() {
             </motion.div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] tracking-tighter uppercase italic">
-              "Les gens comme toi obtiennent leur Visa <br/>
+              &quot;Les gens comme toi obtiennent leur Visa <br/>
               <span className="text-blue-500">Sans Agence</span>."
             </h1>
 
             <div className="space-y-4 max-w-xl mx-auto lg:mx-0">
                 <p className="text-slate-300 text-lg md:text-xl font-medium leading-relaxed">
-                  Arrête de croire qu'il faut forcément être riche ou avoir un gros diplôme pour lancer ta procédure.
+                  Arrête de croire qu&apos;il faut forcément être riche ou avoir un gros diplôme pour lancer ta procédure.
                 </p>
                 <p className="text-white text-lg md:text-xl font-bold border-l-4 border-blue-500 pl-4">
                   Si tu sais lire et suivre des instructions, tu peux monter ton dossier toi-même pour le programme <span className="text-blue-400">Entrée Express</span> et être sélectionné.
@@ -312,7 +287,7 @@ export default function Home() {
                      <p className="text-[10px] text-slate-400 font-bold uppercase">En direct du groupe</p>
                  </div>
                  <p className="text-white text-xs italic">
-                    "J'ai reçu mon invitation à résider ce matin ! Merci pour le guide."
+                    &quot;J&apos;ai reçu mon invitation à résider ce matin ! Merci pour le guide.&quot;
                  </p>
                  <p className="text-slate-400 text-xs font-bold mt-2 text-right">- Marc, Douala</p>
              </motion.div>
