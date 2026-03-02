@@ -34,7 +34,7 @@ export async function initiateChariowCheckout(formData: {
     console.error("Erreur formatage téléphone:", e);
   }
 
-  // 2. Préparation URL de retour
+  // 2. URL de retour
   const rawBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://dreno-learn.vercel.app";
   const baseUrl = rawBaseUrl.replace(/\/$/, ""); 
   const successPath = formData.product_type === "guides" ? "/guide-success" : "/course-success";
@@ -42,7 +42,6 @@ export async function initiateChariowCheckout(formData: {
   const securityToken = randomUUID();
   const cookieStore = await cookies();
   
-  // Cookie sécurisé pour la page de succès
   cookieStore.set("drenolearn_secure_payment", securityToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -91,52 +90,51 @@ export async function initiateChariowCheckout(formData: {
     const isCompleted = result.data?.status === 'completed' || result.data?.payment?.status === 'completed';
 
     // ============================================================
-    // 🚨 CORRECTION FINALE : Gestion Souple du Gratuit (100%)
-    // Si statut completed OU si pas d'URL (mais réponse OK 200) => C'est gratuit
+    // 🔒 SÉCURITÉ RENFORCÉE
+    // On détecte si c'est un cas "GRATUIT" légitime
     // ============================================================
-    if (isCompleted || !checkoutUrl) {
-        console.log("✅ [CHECKOUT] Commande Gratuite validée. Enregistrement Force en Base.");
+    const hasPromoCode = formData.promo_code && formData.promo_code.trim().length > 0;
+    
+    // C'est validé SI : (Statut Completed) OU (Pas d'URL MAIS il y a un code promo)
+    const isValidFreeOrder = isCompleted || (!checkoutUrl && hasPromoCode);
 
-        // --- DÉBUT ENREGISTREMENT MANUEL ---
+    if (isValidFreeOrder) {
+        console.log("✅ [CHECKOUT] Commande validée (Gratuit/Promo). Enregistrement...");
+
         const supabaseAdmin = createClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
           process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
-        // A. Trouver l'ID interne du produit
+        // A. ID Produit
         let internalId = null;
         const { data: guide } = await supabaseAdmin.from("guides").select("id").eq("chariow_id", cleanProductId).maybeSingle();
-        
-        if (guide) {
-            internalId = guide.id;
-        } else {
+        if (guide) { internalId = guide.id; } 
+        else {
             const { data: course } = await supabaseAdmin.from("courses").select("id").eq("chariow_id", cleanProductId).maybeSingle();
             if (course) internalId = course.id;
         }
 
         if (!internalId) {
-            console.error("❌ ERREUR : ID Produit introuvable dans Supabase :", cleanProductId);
-            // On laisse passer pour ne pas bloquer l'utilisateur, mais il faudra vérifier l'ID dans la base
-            return { url: finalRedirectUrl };
+             console.error("❌ ERREUR : Produit introuvable :", cleanProductId);
+             return { url: finalRedirectUrl }; // On redirige quand même
         }
 
-        // B. Trouver ou lier l'utilisateur
+        // B. User ID
         const { data: profile } = await supabaseAdmin.from("profiles").select("id").eq("email", cleanEmail).maybeSingle();
         const userId = profile ? profile.id : null;
 
-        // C. Insérer la commande
-        const { error: orderError } = await supabaseAdmin.from('orders').insert({
+        // C. Commande
+        await supabaseAdmin.from('orders').insert({
             email: cleanEmail,
-            user_id: userId, // Peut être null
+            user_id: userId,
             item_id: internalId,
             item_type: formData.product_type === "guides" ? "guide" : "course",
             status: 'completed',
             amount: 0
         });
 
-        if (orderError) console.error("Erreur écriture Order:", orderError);
-
-        // D. Donner l'accès si l'user existe déjà
+        // D. Accès
         if (userId) {
              await supabaseAdmin.from('user_access').insert({
                 user_id: userId,
@@ -144,12 +142,16 @@ export async function initiateChariowCheckout(formData: {
                 item_type: formData.product_type === "guides" ? "guide" : "course"
             });
         }
-        // --- FIN ENREGISTREMENT MANUEL ---
 
         return { url: finalRedirectUrl };
     }
 
-    // Cas standard payant (On a une URL)
+    // 🚨 SI ON ARRIVE ICI : C'est payant MAIS on n'a pas de lien -> ERREUR
+    if (!checkoutUrl) {
+        console.error("❌ TENTATIVE DE FRAUDE OU BUG : Pas de lien pour un produit payant sans code promo.");
+        return { error: "Erreur technique : Impossible d'obtenir le lien de paiement." };
+    }
+
     return { url: checkoutUrl };
 
   } catch (error: any) {
