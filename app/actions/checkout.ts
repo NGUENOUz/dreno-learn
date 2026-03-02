@@ -3,7 +3,7 @@
 import { parsePhoneNumber, CountryCode } from 'libphonenumber-js';
 import { cookies } from "next/headers";
 import { randomUUID } from "crypto";
-import { createClient } from "@supabase/supabase-js"; // ⚠️ Nécessaire pour l'écriture admin
+import { createClient } from "@supabase/supabase-js";
 
 export async function initiateChariowCheckout(formData: {
   product_id: string;
@@ -17,7 +17,7 @@ export async function initiateChariowCheckout(formData: {
   const cleanEmail = String(formData.email).trim();
   const cleanFullName = String(formData.full_name).trim();
 
-  // 1. Préparation Client
+  // 1. Préparation Identité
   const nameParts = cleanFullName.split(" ");
   const first_name = nameParts[0] || "Client";
   const last_name = nameParts.slice(1).join(" ") || "Elite";
@@ -34,7 +34,7 @@ export async function initiateChariowCheckout(formData: {
     console.error("Erreur formatage téléphone:", e);
   }
 
-  // 2. URL de retour
+  // 2. Préparation URL de retour
   const rawBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://dreno-learn.vercel.app";
   const baseUrl = rawBaseUrl.replace(/\/$/, ""); 
   const successPath = formData.product_type === "guides" ? "/guide-success" : "/course-success";
@@ -42,6 +42,7 @@ export async function initiateChariowCheckout(formData: {
   const securityToken = randomUUID();
   const cookieStore = await cookies();
   
+  // Cookie sécurisé pour la page de succès
   cookieStore.set("drenolearn_secure_payment", securityToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -62,7 +63,7 @@ export async function initiateChariowCheckout(formData: {
   const finalRedirectUrl = `${baseUrl}${successPath}?${successParams}`;
 
   try {
-    // 3. Appel Chariow
+    // 3. Appel API Chariow
     const response = await fetch("https://api.chariow.com/v1/checkout", {
       method: "POST",
       headers: {
@@ -90,19 +91,19 @@ export async function initiateChariowCheckout(formData: {
     const isCompleted = result.data?.status === 'completed' || result.data?.payment?.status === 'completed';
 
     // ============================================================
-    // 🚨 LA CORRECTION EST ICI : GESTION DU CAS GRATUIT (100%)
+    // 🚨 CORRECTION FINALE : Gestion Souple du Gratuit (100%)
+    // Si statut completed OU si pas d'URL (mais réponse OK 200) => C'est gratuit
     // ============================================================
-    if (isCompleted) {
-        console.log("✅ [CHECKOUT] Gratuit détecté. Enregistrement MANUEL en base...");
+    if (isCompleted || !checkoutUrl) {
+        console.log("✅ [CHECKOUT] Commande Gratuite validée. Enregistrement Force en Base.");
 
-        // A. On initialise Supabase en mode ADMIN
+        // --- DÉBUT ENREGISTREMENT MANUEL ---
         const supabaseAdmin = createClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
           process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
-        // B. On cherche l'ID interne du produit (UUID)
-        // On cherche d'abord dans les guides, puis les cours
+        // A. Trouver l'ID interne du produit
         let internalId = null;
         const { data: guide } = await supabaseAdmin.from("guides").select("id").eq("chariow_id", cleanProductId).maybeSingle();
         
@@ -114,26 +115,28 @@ export async function initiateChariowCheckout(formData: {
         }
 
         if (!internalId) {
-            console.error("❌ Erreur Critique : Produit introuvable en base malgré le succès Chariow.");
-            // On redirige quand même pour ne pas bloquer le client, mais l'accès sera vide
+            console.error("❌ ERREUR : ID Produit introuvable dans Supabase :", cleanProductId);
+            // On laisse passer pour ne pas bloquer l'utilisateur, mais il faudra vérifier l'ID dans la base
             return { url: finalRedirectUrl };
         }
 
-        // C. On cherche le User ID (s'il existe déjà)
+        // B. Trouver ou lier l'utilisateur
         const { data: profile } = await supabaseAdmin.from("profiles").select("id").eq("email", cleanEmail).maybeSingle();
         const userId = profile ? profile.id : null;
 
-        // D. On insère la COMMANDE manuellement (Plus besoin d'attendre le Webhook)
-        await supabaseAdmin.from('orders').insert({
+        // C. Insérer la commande
+        const { error: orderError } = await supabaseAdmin.from('orders').insert({
             email: cleanEmail,
-            user_id: userId, // Peut être null si pas encore inscrit
+            user_id: userId, // Peut être null
             item_id: internalId,
             item_type: formData.product_type === "guides" ? "guide" : "course",
             status: 'completed',
-            amount: 0 // C'était gratuit
+            amount: 0
         });
 
-        // E. Si le client existe déjà, on lui donne l'accès direct
+        if (orderError) console.error("Erreur écriture Order:", orderError);
+
+        // D. Donner l'accès si l'user existe déjà
         if (userId) {
              await supabaseAdmin.from('user_access').insert({
                 user_id: userId,
@@ -141,16 +144,12 @@ export async function initiateChariowCheckout(formData: {
                 item_type: formData.product_type === "guides" ? "guide" : "course"
             });
         }
+        // --- FIN ENREGISTREMENT MANUEL ---
 
-        console.log("✅ Accès gratuit enregistré avec succès !");
         return { url: finalRedirectUrl };
     }
 
-    // Gestion cas erreur technique (Pas d'URL reçue)
-    if (!checkoutUrl) {
-        return { error: "Erreur technique : Impossible d'obtenir le lien de paiement." };
-    }
-
+    // Cas standard payant (On a une URL)
     return { url: checkoutUrl };
 
   } catch (error: any) {
