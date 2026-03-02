@@ -7,6 +7,7 @@ import StructuredData from '../components/structuredData';
 import { Analytics } from "@vercel/analytics/react";
 import { MicrosoftClarity } from "@/components/MicrosoftClarity";
 import { FacebookPixel } from "@/components/FacebookPixel";
+import { Suspense } from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 
@@ -73,7 +74,9 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
         {/* On a retiré le Header d'ici */}
         <MicrosoftClarity />
-        <FacebookPixel />
+       <Suspense fallback={null}>
+            <FacebookPixel />
+        </Suspense>
         {children}
         <StructuredData/>
         <Analytics />

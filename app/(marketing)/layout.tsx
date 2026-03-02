@@ -3,6 +3,7 @@ import { FacebookPixel } from "@/components/FacebookPixel";
 import { Header } from "@/components/Header";
 import { HeaderDemo } from "@/components/headerDemo";
 import { ExitIntentPopup } from "@/components/ui/exitIntentPopup";
+import { Suspense } from "react";
 
 
 export default function MarketingLayout({
@@ -14,7 +15,9 @@ export default function MarketingLayout({
       <main className="grow flex flex-col">
         {children}
         <ExitIntentPopup />
-        <FacebookPixel />
+        <Suspense fallback={null}>
+            <FacebookPixel />
+        </Suspense>
       </main>
       
     </>
