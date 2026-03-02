@@ -61,7 +61,7 @@ export function SocialProofPopup() {
       <div className="grow">
         <p className="text-[13px] text-slate-900 leading-snug">
           <span className="font-bold">{sale.name}</span> vient d&apos;acheter <br />
-          <span className="font-bold text-blue-600">{sale.course}</span>.
+          <span className="font-bold text-blue-600">le guide</span>.
         </p>
         
         {/* NOUVEAU BADGE VÉRIFIÉ */}

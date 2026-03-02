@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { SocialProofPopup } from '../../components/ui/socialProofPopup';
 import {
   Accordion,
   AccordionContent,
@@ -30,7 +31,7 @@ import {
 
 // --- CONFIGURATION ---
 const PRODUCT = {
-  id: "guide-express",
+  id: "guide-express-2026",
   price: 2900,
   old_price: 15000,
 };
@@ -650,6 +651,8 @@ export default function Home() {
             scrollbar-width: none;
         }
       `}</style>
+
+      <SocialProofPopup/>
     </div>
   );
 }
