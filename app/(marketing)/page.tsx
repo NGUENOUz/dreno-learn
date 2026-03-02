@@ -21,13 +21,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { SocialProofPopup } from '../../components/ui/socialProofPopup';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import * as fbq from "@/lib/fpixel";
 
 // --- CONFIGURATION ---
 const PRODUCT = {
@@ -60,6 +54,7 @@ const CountdownTimer = ({ small = false }: { small?: boolean }) => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
 
   return (
     <div className={`flex items-center gap-1 text-red-600 font-black font-mono ${small ? "text-xs bg-red-50/50 px-2 py-0.5" : "text-base bg-red-50 px-3 py-1.5"} rounded-lg border border-red-100 shadow-sm`}>
@@ -153,6 +148,7 @@ const EliteCard = ({ isMobileFlow = false }: { isMobileFlow?: boolean }) => (
 
     <Button
       asChild
+      onClick={handleDownloadClick}
       className="w-full h-16 bg-green-600 hover:bg-green-700 text-white font-black rounded-2xl text-lg shadow-xl shadow-green-200 group relative overflow-hidden active:scale-95 uppercase italic animate-pulse-fast"
     >
       <Link href={`/guides/${PRODUCT.id}/checkout`}>
@@ -177,12 +173,31 @@ const EliteCard = ({ isMobileFlow = false }: { isMobileFlow?: boolean }) => (
   </div>
 );
 
+const handleDownloadClick = () => {
+  // On dit à Facebook : "Quelqu'un a commencé le processus d'achat"
+  fbq.event("InitiateCheckout", {
+    content_name: "Guide Entrée Express Canada 2026",
+    currency: "USD",
+    value: 2,
+  });
+};
+
 export default function Home() {
   const [showStickyCTA, setShowStickyCTA] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setShowStickyCTA(window.scrollY > 900); 
     window.addEventListener("scroll", handleScroll);
+    
+    // 👇 2. AJOUT : On dit à Facebook que le produit est vu
+    fbq.event("ViewContent", {
+      content_name: "Guide Entrée Express Canada 2026",
+      content_ids: ["guide-express-2026"],
+      content_type: "product",
+      value: 4.75,
+      currency: "USD",
+    });
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -215,7 +230,7 @@ export default function Home() {
                      <p className="text-xs text-slate-400 font-bold line-through decoration-red-500">{PRODUCT.old_price} F</p>
                      <p className="text-2xl font-black text-slate-900 leading-none italic">{PRODUCT.price} F</p>
                  </div>
-                 <Button asChild className="h-12 bg-green-600 hover:bg-green-700 text-white font-black px-8 rounded-xl uppercase italic shadow-lg shadow-green-200 transition-transform hover:scale-105 animate-pulse-fast">
+                 <Button onClick={handleDownloadClick} asChild className="h-12 bg-green-600 hover:bg-green-700 text-white font-black px-8 rounded-xl uppercase italic shadow-lg shadow-green-200 transition-transform hover:scale-105 animate-pulse-fast">
                     <Link href={`/guides/${PRODUCT.id}/checkout`}>
                         Télécharger
                     </Link>
@@ -262,7 +277,7 @@ export default function Home() {
             </div>
             
             <div className="pt-6 flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start">
-                 <Button asChild className="h-16 px-10 bg-white hover:bg-slate-100 text-slate-900 text-lg font-black uppercase italic rounded-full shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)] transition-transform hover:scale-105">
+                 <Button onClick={handleDownloadClick} asChild className="h-16 px-10 bg-white hover:bg-slate-100 text-slate-900 text-lg font-black uppercase italic rounded-full shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)] transition-transform hover:scale-105">
                     <Link href="#comment-ca-marche">Comment est-ce possible ?</Link>
                  </Button>
                  
@@ -615,6 +630,7 @@ export default function Home() {
             
             <Button
               asChild
+              onClick={handleDownloadClick}
               className="h-12 px-6 bg-green-600 text-white font-black rounded-xl uppercase italic shadow-lg active:scale-95 transition-all animate-pulse-fast"
             >
               <Link href={`/guides/${PRODUCT.id}/checkout`}>

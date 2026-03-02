@@ -4,7 +4,9 @@ import { Inter } from "next/font/google";
 import { Toaster } from 'sonner';
 import "./globals.css";
 import StructuredData from '../components/structuredData';
-
+import { Analytics } from "@vercel/analytics/react";
+import { MicrosoftClarity } from "@/components/MicrosoftClarity";
+import { FacebookPixel } from "@/components/FacebookPixel";
 const inter = Inter({ subsets: ["latin"] });
 
 
@@ -70,8 +72,11 @@ export default function RootLayout({
     <html lang="fr" className="scroll-smooth">
       <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
         {/* On a retiré le Header d'ici */}
+        <MicrosoftClarity />
+        <FacebookPixel />
         {children}
         <StructuredData/>
+        <Analytics />
         <Toaster position="top-right" richColors />
       </body>
     </html>

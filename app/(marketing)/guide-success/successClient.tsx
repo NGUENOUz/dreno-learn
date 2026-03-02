@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import * as fbq from "@/lib/fpixel"
 import confetti from "canvas-confetti"; // 🎉 L'outil magique
 
 
@@ -47,6 +48,16 @@ import confetti from "canvas-confetti"; // 🎉 L'outil magique
     }, 250);
   };
 export default function SuccessClient() {
+
+  useEffect(() => {
+      // ...
+      fbq.event("Purchase", {
+        currency: "USD", // On passe en Dollars
+        value: 2,     // La valeur réelle pour que le ROAS soit vert
+        content_name: "Guide Entrée Express Canada 2026",
+      });
+  }, []);
+
   const searchParams = useSearchParams();
   const chariowId = searchParams.get("chariow_id"); 
   const name = searchParams.get("name") || "Champion";

@@ -3,12 +3,19 @@ import Link from "next/link";
 import SuccessClient from "./successClient";
 import { AlertTriangle } from "lucide-react";
 
+
+
 // 1. Définition correcte du type pour Next.js 15
 type Props = {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }
 
+
+
 export default async function GuideSuccessPage({ searchParams }: Props) {
+
+
+
   // 🔐 1. Lire le ticket dans le navigateur (Cookie)
   const cookieStore = await cookies();
   const browserToken = cookieStore.get("drenolearn_secure_payment")?.value;

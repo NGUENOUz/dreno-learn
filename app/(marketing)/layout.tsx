@@ -1,4 +1,5 @@
 // app/(marketing)/layout.tsx
+import { FacebookPixel } from "@/components/FacebookPixel";
 import { Header } from "@/components/Header";
 import { HeaderDemo } from "@/components/headerDemo";
 import { ExitIntentPopup } from "@/components/ui/exitIntentPopup";
@@ -13,6 +14,7 @@ export default function MarketingLayout({
       <main className="grow flex flex-col">
         {children}
         <ExitIntentPopup />
+        <FacebookPixel />
       </main>
       
     </>
