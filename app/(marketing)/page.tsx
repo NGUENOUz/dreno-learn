@@ -211,7 +211,7 @@ export default function Home() {
                      <p className="text-xs text-slate-400 font-bold line-through">{PRODUCT.old_price} F</p>
                      <p className="text-xl font-black text-slate-900 leading-none">{PRODUCT.price} F</p>
                  </div>
-                 <Button onClick={handleDownloadClick} asChild className="h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 rounded-lg uppercase text-xs tracking-wider shadow-lg shadow-blue-200 transition-transform hover:scale-105">
+                 <Button onClick={handleDownloadClick} asChild className="h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 rounded-lg uppercase text-xs tracking-wider shadow-lg shadow-blue-200 transition-transform hover:scale-105 animate-pulse-slow">
                     <Link href={`/guides/${PRODUCT.id}/checkout`}>
                         Télécharger le guide
                     </Link>
@@ -255,7 +255,7 @@ export default function Home() {
                 <Button 
                   asChild 
                   onClick={handleDownloadClick}
-                  className="h-16 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold uppercase px-8 rounded-xl shadow-xl shadow-blue-200 hover:-translate-y-1 transition-all"
+                  className="h-16 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold uppercase px-8 rounded-xl shadow-xl shadow-blue-200 hover:-translate-y-1 transition-all animate-pulse-slow"
                 >
                   <Link href="/guides/guide-express-2026/checkout">
                     <Download className="w-5 h-5 mr-3" />
@@ -470,7 +470,7 @@ export default function Home() {
                       <Button 
                         asChild 
                         onClick={handleDownloadClick}
-                        className="w-full md:w-auto h-20 bg-blue-600 hover:bg-white hover:text-blue-600 text-white text-xl md:text-2xl font-black italic uppercase px-12 rounded-2xl shadow-[0_10px_40px_-10px_rgba(37,99,235,0.5)] hover:shadow-[0_10px_40px_-10px_rgba(255,255,255,0.3)] hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-blue-600"
+                        className="w-full md:w-auto h-20 bg-blue-600 hover:bg-white hover:text-blue-600 text-white text-xl md:text-2xl font-black italic uppercase px-12 rounded-2xl shadow-[0_10px_40px_-10px_rgba(37,99,235,0.5)] hover:shadow-[0_10px_40px_-10px_rgba(255,255,255,0.3)] hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-blue-600 animate-pulse-slow"
                       >
                           <Link href="/guides/guide-express-2026/checkout" className="flex items-center gap-4">
                               <span>Télécharger le Guide</span>
@@ -551,7 +551,7 @@ export default function Home() {
         <Button 
             asChild 
             onClick={handleDownloadClick}
-            className="bg-slate-900 hover:bg-blue-600 text-white font-black italic uppercase px-10 py-6 rounded-xl shadow-xl shadow-slate-200 hover:shadow-blue-200 hover:-translate-y-1 transition-all duration-300"
+            className="bg-slate-900 hover:bg-blue-600 text-white font-black italic uppercase px-10 py-6 rounded-xl shadow-xl shadow-slate-200 hover:shadow-blue-200 hover:-translate-y-1 transition-all duration-300 animate-pulse-slow"
         >
             <Link href="/guides/guide-express-2026/checkout" className="flex items-center gap-3">
                 <span>Télécharger la version complète</span>
@@ -680,7 +680,7 @@ export default function Home() {
             <Button
               asChild
               onClick={handleDownloadClick}
-              className="h-11 px-6 bg-blue-600 text-white font-bold rounded-lg uppercase tracking-wide text-xs shadow-lg active:scale-95 transition-all"
+              className="h-11 px-6 bg-blue-600 text-white font-bold rounded-lg uppercase tracking-wide text-xs shadow-lg active:scale-95 transition-all animate-pulse-slow"
             >
               <Link href={`/guides/${PRODUCT.id}/checkout`}>
                 Télécharger <ArrowRight className="w-4 h-4 ml-2" />
