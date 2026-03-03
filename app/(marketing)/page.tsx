@@ -254,6 +254,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-2">
                 <Button 
                   asChild 
+                  onClick={handleDownloadClick}
                   className="h-16 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold uppercase px-8 rounded-xl shadow-xl shadow-blue-200 hover:-translate-y-1 transition-all"
                 >
                   <Link href="/guides/guide-express-2026/checkout">
@@ -468,6 +469,7 @@ export default function Home() {
                       {/* BOUTON PRINCIPAL */}
                       <Button 
                         asChild 
+                        onClick={handleDownloadClick}
                         className="w-full md:w-auto h-20 bg-blue-600 hover:bg-white hover:text-blue-600 text-white text-xl md:text-2xl font-black italic uppercase px-12 rounded-2xl shadow-[0_10px_40px_-10px_rgba(37,99,235,0.5)] hover:shadow-[0_10px_40px_-10px_rgba(255,255,255,0.3)] hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-blue-600"
                       >
                           <Link href="/guides/guide-express-2026/checkout" className="flex items-center gap-4">
@@ -548,6 +550,7 @@ export default function Home() {
     <div className="text-center mt-8">
         <Button 
             asChild 
+            onClick={handleDownloadClick}
             className="bg-slate-900 hover:bg-blue-600 text-white font-black italic uppercase px-10 py-6 rounded-xl shadow-xl shadow-slate-200 hover:shadow-blue-200 hover:-translate-y-1 transition-all duration-300"
         >
             <Link href="/guides/guide-express-2026/checkout" className="flex items-center gap-3">
