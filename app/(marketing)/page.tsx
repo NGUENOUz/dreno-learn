@@ -140,7 +140,7 @@ const EliteCard = ({ isMobileFlow = false }: { isMobileFlow?: boolean }) => (
       className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-lg shadow-xl shadow-blue-100 group relative overflow-hidden active:scale-95 uppercase tracking-wide animate-pulse-slow"
     >
       <Link href={`/guides/${PRODUCT.id}/checkout`}>
-        Télécharger maintenant <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+        Accéder maintenant <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
       </Link>
     </Button>
 
