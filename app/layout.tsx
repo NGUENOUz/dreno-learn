@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { MicrosoftClarity } from "@/components/MicrosoftClarity";
 import { FacebookPixel } from "@/components/FacebookPixel";
 import { Suspense } from "react";
+import { ExitPopup } from "@/components/ExitPopup";
 const inter = Inter({ subsets: ["latin"] });
 
 
@@ -57,6 +58,7 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
         {/* On a retiré le Header d'ici */}
         <MicrosoftClarity />
+         <ExitPopup />
        <Suspense fallback={null}>
             <FacebookPixel />
         </Suspense>
