@@ -12,58 +12,41 @@ const inter = Inter({ subsets: ["latin"] });
 
 
 
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://drenolearn.com'), // Ton vrai domaine
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://drenolearn.com'),
   title: {
-    default: "Guide Entrée Express Canada 2026 | Immigrer sans Agence",
-    template: "%s | DrenoLearn"
+    default: "Formation : Réussir son Dossier Canada (Méthode 2026)", // "Formation" est le mot magique
+    template: "%s | DrenoLearn Academy" // "Academy" renforce l'éducation
   },
-  description: "Téléchargez le guide complet pour réussir votre immigration au Canada (Entrée Express) depuis l'Afrique. Méthode étape par étape, sans intermédiaire. Modèles CV et Lettres inclus.",
+  description: "Téléchargez le support de cours complet pour comprendre la procédure Entrée Express. Formation étape par étape, modèles de documents et auto-évaluation.",
   keywords: [
-    "Immigration Canada", 
-    "Entrée Express 2026", 
-    "Visa Canada Cameroun", 
-    "Immigrer sans agence", 
-    "Guide Canada PDF", 
-    "Travail Canada depuis l'Afrique",
-    "Score CRS",
-    "Guichet Emploi"
+    "Formation en ligne", 
+    "Guide pratique 2026", 
+    "Apprentissage autodidacte", 
+    "Support de cours PDF", 
+    "Modèles administratifs", 
+    "Tutoriel Entrée Express",
+    "Méthodologie Canada",
+    "Auto-évaluation"
   ],
-  authors: [{ name: "DrenoLearn Team" }],
-  creator: "DrenoLearn",
   openGraph: {
-    type: "website",
+    type: "book", // On dit à Facebook que c'est un LIVRE, pas un service politique
     locale: "fr_FR",
     url: "https://drenolearn.com",
-    title: "🇨🇦 Stop aux Agences : Faites votre procédure Canada vous-même",
-    description: "La méthode exacte pour obtenir votre Visa Résident Permanent. Guide + Groupe WhatsApp + Modèles Word. À partir de 2900 FCFA.",
-    siteName: "DrenoLearn",
+    title: "📚 Formation DrenoLearn : Le Guide de l'Autonomie 2026",
+    description: "Apprenez à monter votre dossier vous-même. Support PDF complet + Accès Communauté d'Apprentissage.",
+    siteName: "DrenoLearn Academy",
     images: [
       {
-        url: "https://res.cloudinary.com/dcsl6xhli/image/upload/v1772423462/guide_entr%C3%A9e_express_canada_3_hqgkmm.png", // Ton image de couverture
+        url: "https://res.cloudinary.com/dcsl6xhli/image/upload/v1772423462/guide_entr%C3%A9e_express_canada_3_hqgkmm.png",
         width: 1200,
         height: 630,
-        alt: "Guide Entrée Express Canada 2026",
+        alt: "Couverture du Guide de Formation 2026",
       },
     ],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "🇨🇦 Guide Canada 2026 : Immigrez seul et économisez 1 Million",
-    description: "Tout ce qu'il faut savoir sur l'Entrée Express. PDF Téléchargeable immédiatement.",
-    images: ["https://res.cloudinary.com/dcsl6xhli/image/upload/v1772423462/guide_entr%C3%A9e_express_canada_3_hqgkmm.png"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
+  
 };
 
 export default function RootLayout({
