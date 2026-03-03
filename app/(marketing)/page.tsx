@@ -158,7 +158,7 @@ const EliteCard = ({ isMobileFlow = false }: { isMobileFlow?: boolean }) => (
     
     <div className="text-center mt-2">
         <p className="text-[10px] text-slate-400 font-medium flex items-center justify-center gap-1">
-            <Lock className="w-3 h-3"/> Paiement sécurisé • Accès Immédiat
+            <Lock className="w-3 h-3"/> Paiement Mobile sécurisé • Accès Immédiat 
         </p>
     </div>
   </div>
