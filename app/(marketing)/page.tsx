@@ -36,7 +36,13 @@ const PRODUCT = {
   old_price: 15000,
   name: "Masterclass: Dossier Technique Canada", // Nom orienté éducation
 };
-
+const PROOF_IMAGES = [
+ "https://res.cloudinary.com/dcsl6xhli/image/upload/v1772600262/WhatsApp_Image_2026-03-04_at_05.55.05_kok7vc.jpg",
+  "https://res.cloudinary.com/dcsl6xhli/image/upload/v1772600262/WhatsApp_Image_2026-03-04_at_05.55.05_kok7vc.jpg",
+"https://res.cloudinary.com/dcsl6xhli/image/upload/v1772600262/WhatsApp_Image_2026-03-04_at_05.55.03_j0qsiw.jpg",
+"https://res.cloudinary.com/dcsl6xhli/image/upload/v1772600262/WhatsApp_Image_2026-03-04_at_05.55.02_isodwv.jpg",
+"https://res.cloudinary.com/dcsl6xhli/image/upload/v1772600262/WhatsApp_Image_2026-03-04_at_05.55.04_xhd64v.jpg",
+];
 // --- IMAGES DU GUIDE (Cloudinary) ---
 const GUIDE_IMAGES = [
     { src: "https://res.cloudinary.com/dcsl6xhli/image/upload/v1772423462/guide_entr%C3%A9e_express_canada_odl7i3.png", title: "Module 1 : Le Sommaire" },
@@ -69,6 +75,86 @@ const CountdownTimer = ({ small = false }: { small?: boolean }) => {
     </div>
   );
 };
+
+const DeliveryProof = () => (
+  <section className="py-20 bg-slate-900 overflow-hidden relative border-y border-slate-800">
+    {/* Fond lumineux subtil */}
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none" />
+
+    <div className="max-w-7xl mx-auto px-4 text-center mb-12 relative z-10">
+      <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20 shadow-sm mb-4">
+        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+        <span className="text-[10px] font-black uppercase tracking-widest text-green-400">
+          Transparence Totale
+        </span>
+      </div>
+      <h2 className="text-3xl md:text-4xl font-black text-white uppercase italic tracking-tight">
+        Ils ont commandé, <br />
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">
+          ils ont reçu immédiatement.
+        </span>
+      </h2>
+      <p className="text-slate-400 mt-4 max-w-2xl mx-auto text-sm font-medium">
+        Pas d'attente, pas de blabla. Dès validation, votre accès est envoyé par
+        Mail et WhatsApp automatiquement. Voici les preuves de cette semaine.
+      </p>
+    </div>
+
+    {/* CAROUSEL INFINI (Marquee) */}
+    <div className="relative w-full flex gap-6 overflow-hidden py-4 group">
+      {/* On duplique la liste 2 fois pour l'effet infini fluide */}
+      {[...PROOF_IMAGES, ...PROOF_IMAGES].map((src, i) => (
+        <div
+          key={i}
+          className="relative min-w-[200px] md:min-w-[240px] aspect-[9/16] rounded-2xl overflow-hidden border-4 border-slate-800 bg-slate-800 shadow-2xl shrink-0 animate-marquee"
+        >
+          {/* Simulation d'interface téléphone */}
+          <div className="absolute top-0 left-0 right-0 h-6 bg-slate-950 z-10 flex justify-center items-center">
+             <div className="w-16 h-4 bg-black rounded-b-xl"/>
+          </div>
+          
+          <Image
+            src={src}
+            alt="Preuve de livraison"
+            fill
+            className="object-cover opacity-90 hover:opacity-100 transition-opacity"
+          />
+          
+          {/* Badge Vérifié sur l'image */}
+          <div className="absolute bottom-3 right-3 bg-green-500 text-white text-[9px] font-black px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
+             <CheckCircle2 className="w-3 h-3"/> REÇU
+          </div>
+        </div>
+      ))}
+      
+      {/* Masques de fondu sur les côtés */}
+      <div className="absolute inset-y-0 left-0 w-12 md:w-32 bg-gradient-to-r from-slate-900 to-transparent z-20" />
+      <div className="absolute inset-y-0 right-0 w-12 md:w-32 bg-gradient-to-l from-slate-900 to-transparent z-20" />
+    </div>
+
+    {/* Note de bas de page */}
+    <div className="text-center mt-8 relative z-10">
+       <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+         <Lock className="w-3 h-3 inline mr-1 mb-0.5"/> Système de livraison automatisé 24h/24
+       </p>
+    </div>
+
+    {/* Style pour l'animation (à mettre dans globals.css idéalement, mais fonctionne ici via style jsx) */}
+    <style jsx>{`
+      @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+      }
+      .animate-marquee {
+        animation: marquee 30s linear infinite;
+      }
+      /* Pause au survol pour bien voir */
+      .group:hover .animate-marquee {
+        animation-play-state: paused;
+      }
+    `}</style>
+  </section>
+);
 
 // --- COMPOSANT : PAGE APERÇU (Style "Livre de cours") ---
 const PreviewPage = ({ src, title }: { src: string, title: string }) => (
@@ -563,6 +649,8 @@ export default function Home() {
         </p>
     </div>
 </section>
+
+<DeliveryProof />
 
       {/* --- 6. BONUS SECTION (La "Boîte à Outils") --- */}
       <section className="py-20 px-4 bg-white">
