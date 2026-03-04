@@ -23,7 +23,9 @@ export const ExitPopup = () => {
   }, [hasBeenShown]);
 
   // Lien WhatsApp avec message pré-rempli
-  const whatsappUrl = "https://wa.me/237620456618?text=Bonjour,%20j'ai%20une%20question%20sur%20le%20guide%20Canada...";
+  const phoneNumber = "237697238790"; // Remplacez par votre numéro
+  const defaultMessage = "Bonjour, j'ai une question concernant le guide.";
+   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(defaultMessage)}`;
 
   return (
     <AnimatePresence>

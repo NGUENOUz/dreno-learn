@@ -9,6 +9,7 @@ import { MicrosoftClarity } from "@/components/MicrosoftClarity";
 import { FacebookPixel } from "@/components/FacebookPixel";
 import { Suspense } from "react";
 import { ExitPopup } from "@/components/ExitPopup";
+import WhatsAppButton from "@/components/WhatsappButton";
 const inter = Inter({ subsets: ["latin"] });
 
 
@@ -94,7 +95,9 @@ export default function RootLayout({
         </Suspense>
         {children}
         <StructuredData/>
+          <WhatsAppButton/>
         <Analytics />
+        
         <Toaster position="top-right" richColors />
       </body>
     </html>
