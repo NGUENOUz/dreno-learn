@@ -220,7 +220,7 @@ export default function GuideCheckoutPage() {
                   />
                 </div>
 
-                <div className="space-y-2 pt-2">
+                {/* <div className="space-y-2 pt-2">
                   <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest ml-1">Code Promo</label>
                   <div className="relative group">
                     <TicketPercent className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
@@ -231,7 +231,7 @@ export default function GuideCheckoutPage() {
                       className="w-full h-14 pl-12 pr-6 rounded-2xl border border-slate-100 bg-slate-50 font-bold text-xs tracking-widest focus:border-blue-600 outline-none transition-all"
                     />
                   </div>
-                </div>
+                </div> */}
               </div>
 
               <div className="space-y-6 pt-4">

@@ -71,6 +71,11 @@ const [supabase] = useState(() => createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 ));
 
+const phoneNumber = "237697238790"; // Remplacez par votre numéro
+  const defaultMessage = "Bonjour, je vien d'effectuer le paiement et je veux rejoindre le groupe";
+   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(defaultMessage)}`;
+
+
   useEffect(() => {
     const fetchGuide = async () => {
       if (!chariowId) return setLoading(false);
@@ -151,7 +156,7 @@ const [supabase] = useState(() => createBrowserClient(
                 <p className="text-green-700/70 text-xs mt-1">Rejoignez la communauté pour vos questions.</p>
               </div>
               <Button asChild className="w-full h-14 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-black uppercase italic text-xs transition-all shadow-xl shadow-green-200">
-                <a href="https://chat.whatsapp.com/LRRg4o2N76U80U3isqOdvg?mode=gi_t" target="_blank" rel="noopener noreferrer">Rejoindre le groupe</a>
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">Rejoindre le groupe</a>
               </Button>
             </div>
           </div>
